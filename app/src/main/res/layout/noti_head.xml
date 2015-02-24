@@ -18,9 +18,7 @@
             android:layout_alignParentTop="true"
             android:layout_margin="0dp"
             android:clickable="true"
-            android:scaleType="centerCrop"
-
-            android:src="@drawable/profile" />
+            android:scaleType="centerCrop"/>
 
         <RelativeLayout
             android:id="@+id/lay_noti_text"

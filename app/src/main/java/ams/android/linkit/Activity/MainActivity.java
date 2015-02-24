@@ -19,7 +19,6 @@ public class MainActivity extends Activity implements FragmentWebView.BackHandle
 
     private static String TAG = "linkit";
 
-
     private FragmentWebView selectedFragment;
 
     @Override
@@ -69,11 +68,11 @@ public class MainActivity extends Activity implements FragmentWebView.BackHandle
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-        finish();
-    }
+//    @Override
+//    protected void onUserLeaveHint() {
+//        super.onUserLeaveHint();
+//        finish();
+//    }
 
     @Override
     public void onBackPressed() {
@@ -102,7 +101,6 @@ public class MainActivity extends Activity implements FragmentWebView.BackHandle
             Log.i(TAG, "Error on back - " + e.getMessage());
         }
     }
-
 
     @Override
     public void setSelectedFragment(FragmentWebView selectedFragment) {

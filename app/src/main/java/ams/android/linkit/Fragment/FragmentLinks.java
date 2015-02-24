@@ -104,8 +104,6 @@ public class FragmentLinks extends Fragment {
                 });
                 AlertDialog alert = builder.create();
                 alert.show();
-
-
             }
         });
 
@@ -169,6 +167,7 @@ public class FragmentLinks extends Fragment {
         client.post(URL, new AsyncHttpResponseHandler() {
             @Override
             public void onStart() {
+
             }
 
             @Override
@@ -179,24 +178,24 @@ public class FragmentLinks extends Fragment {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.addToBackStack("Login");
+                //ft.addToBackStack("Login");
                 ft.commit();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 if (statusCode == 401) {
-                    Log.e("linkit-merchant", "ERR 401");
+                    Log.e("linkit", "ERR 401");
                     ((GlobalApplication) getActivity().getApplication()).clearAllSettings();
-                    showToast("Logout");
-                    FragmentLogin f1 = new FragmentLogin();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.addToBackStack("Login");
-                    ft.commit();
+//                    showToast("Logout");
+//                    FragmentLogin f1 = new FragmentLogin();
+//                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                    ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
+//                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                    ft.addToBackStack("Login");
+//                    ft.commit();
                 } else {
-                    Log.e("linkit-merchant", "ERR");
+                    Log.e("linkit", "ERR");
                 }
 
             }
@@ -312,7 +311,7 @@ public class FragmentLinks extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                //Log.e("linkit-merchant", "ERR : " + errorResponse.toString());
+                //Log.e("linkit", "ERR : " + errorResponse.toString());
             }
 
             @Override
@@ -376,7 +375,7 @@ public class FragmentLinks extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                //Log.e("linkit-merchant", "ERR : " + errorResponse.toString());
+                //Log.e("linkit", "ERR : " + errorResponse.toString());
             }
 
             @Override

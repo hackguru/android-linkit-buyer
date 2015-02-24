@@ -1,31 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:weightSum="100">
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+    android:weightSum="100"
+    android:background="#ffffff">
 
     <WebView
-        android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_above="@+id/imageView3"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentTop="false"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/webViewLogin"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="60"
-        android:background="@drawable/backrepeat" />
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/backrepeat"
+        android:layout_alignParentRight="true"
+        android:minHeight="300dp"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/imgIntro" />
 
     <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgRefresh"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@+id/webViewLogin"
+        android:layout_alignBottom="@+id/webViewLogin"
+        android:src="@drawable/refresh"
+        android:scaleType="centerInside" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgIntro"
+        android:src="@drawable/intro_video_bg"
+        android:scaleType="centerInside"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_weight="40"
-        android:padding="20dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/linkit512" />
-</LinearLayout>
+        android:adjustViewBounds="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgPlay"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@+id/imgIntro"
+        android:layout_alignBottom="@+id/imgIntro"
+        android:layout_alignLeft="@+id/imgIntro"
+        android:layout_alignRight="@+id/imgIntro"
+        android:src="@drawable/play96"
+        android:scaleType="centerInside" />
+
+
+</RelativeLayout>

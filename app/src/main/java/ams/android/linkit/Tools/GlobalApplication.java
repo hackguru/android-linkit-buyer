@@ -17,9 +17,6 @@ public class GlobalApplication extends Application {
     private static String PROPERTY_USER_ID = "user_id";
     private static String PROPERTY_REG_ID = "registration_id";
     private static String PROPERTY_APP_VERSION = "appVersion";
-    private int badgetCount;
-    private String userId = "";
-    private String registrationId = "";
 
     public GlobalApplication() {
         super();
@@ -38,7 +35,6 @@ public class GlobalApplication extends Application {
     }
 
     public void setBadgetCount(int badgetCount) {
-        this.badgetCount = badgetCount;
         try {
             final SharedPreferences prefs = getGCMPreferences();
             int appVersion = getAppVersion();
@@ -52,27 +48,22 @@ public class GlobalApplication extends Application {
     }
 
     public String getUserId() {
-        if (userId.length() > 0) {
-            return userId;
-        } else {
-            final SharedPreferences prefs = getGCMPreferences();
-            String userIdSaved = prefs.getString(PROPERTY_USER_ID, "");
-            if (userIdSaved.isEmpty()) {
-                Log.i(TAG, "User not found.");
-                return "";
-            }
-            int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-            int currentVersion = getAppVersion();
-            if (registeredVersion != currentVersion) {
-                Log.i(TAG, "App version changed.");
-                return "";
-            }
-            return userIdSaved;
+        final SharedPreferences prefs = getGCMPreferences();
+        String userIdSaved = prefs.getString(PROPERTY_USER_ID, "");
+        if (userIdSaved.isEmpty()) {
+            Log.i(TAG, "User not found.");
+            return "";
         }
+        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+        int currentVersion = getAppVersion();
+        if (registeredVersion != currentVersion) {
+            Log.i(TAG, "App version changed.");
+            return "";
+        }
+        return userIdSaved;
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
         try {
             final SharedPreferences prefs = getGCMPreferences();
             int appVersion = getAppVersion();
@@ -81,33 +72,29 @@ public class GlobalApplication extends Application {
             editor.putString(PROPERTY_USER_ID, userId);
             editor.putInt(PROPERTY_APP_VERSION, appVersion);
             editor.commit();
+
         } catch (Exception e) {
         }
     }
 
     public String getRegistrationId() {
-        if (registrationId.length() > 0) {
-            return registrationId;
-        } else {
-            final SharedPreferences prefs = getGCMPreferences();
-            String registrationIdSaved = prefs.getString(PROPERTY_REG_ID, "");
-            if (registrationIdSaved.isEmpty()) {
-                Log.i(TAG, "Registration not found.");
-                return "";
-            }
-
-            int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-            int currentVersion = getAppVersion();
-            if (registeredVersion != currentVersion) {
-                Log.i(TAG, "App version changed.");
-                return "";
-            }
-            return registrationIdSaved;
+        final SharedPreferences prefs = getGCMPreferences();
+        String registrationIdSaved = prefs.getString(PROPERTY_REG_ID, "");
+        if (registrationIdSaved.isEmpty()) {
+            Log.i(TAG, "Registration not found.");
+            return "";
         }
+
+        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+        int currentVersion = getAppVersion();
+        if (registeredVersion != currentVersion) {
+            Log.i(TAG, "App version changed.");
+            return "";
+        }
+        return registrationIdSaved;
     }
 
     public void setRegistrationId(String registrationId) {
-        this.registrationId = registrationId;
         try {
             final SharedPreferences prefs = getGCMPreferences();
             int appVersion = getAppVersion();
@@ -124,9 +111,9 @@ public class GlobalApplication extends Application {
         try {
             final SharedPreferences prefs = getGCMPreferences();
             int appVersion = getAppVersion();
-            Log.i(TAG, "Erase all settings on app version " + appVersion);
+            Log.i(TAG, "Erase UserID settings on app version " + appVersion);
             SharedPreferences.Editor editor = prefs.edit();
-            editor.clear();
+            editor.remove(PROPERTY_USER_ID);
             editor.commit();
         } catch (Exception e) {
         }
