@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -14,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -45,10 +48,10 @@ import ams.android.linkit.Tools.myListView;
  */
 public class FragmentLinks extends Fragment {
 
-    static ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
-    static ArrayList<LinkitObject> itemsEmpty = new ArrayList<LinkitObject>();
-    static AdapterListview adapterListview;
-    static AdapterListviewEmpty adapterListviewEmpty;
+    ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
+    ArrayList<LinkitObject> itemsEmpty = new ArrayList<LinkitObject>();
+    AdapterListview adapterListview;
+    AdapterListviewEmpty adapterListviewEmpty;
     myListView listView;
     String userID, regID;
     LayoutInflater ginflater;
@@ -57,6 +60,7 @@ public class FragmentLinks extends Fragment {
     LinkitObject currentItem;
     RelativeLayout layWaiting;
     Boolean callState = false;
+    TextView txtEmptyInfo;
 
     public static final FragmentLinks newInstance(LinkitObject item) {
         FragmentLinks f = new FragmentLinks();
@@ -78,6 +82,7 @@ public class FragmentLinks extends Fragment {
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         ImageButton btnLogout = (ImageButton) rootView.findViewById(R.id.btn_logout);
         layWaiting = (RelativeLayout) rootView.findViewById(R.id.lay_waiting);
+        txtEmptyInfo = (TextView)rootView.findViewById(R.id.txtEmptyInfo);
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,12 +145,6 @@ public class FragmentLinks extends Fragment {
 
         refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
     }
 
     private void showToast(String text) {
@@ -294,6 +293,7 @@ public class FragmentLinks extends Fragment {
                     refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
 
                 } else {
+                    txtEmptyInfo.setVisibility(View.GONE);
                     adapterListview.notifyDataSetChanged();
                     swipeLayout.setRefreshing(false);
                     if (currentItem != null) {
@@ -354,8 +354,22 @@ public class FragmentLinks extends Fragment {
                     e.printStackTrace();
                 }
 
+                swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
+                    }
+                });
+                swipeLayout.setRefreshing(false);
                 adapterListviewEmpty = new AdapterListviewEmpty(getActivity(), getFragmentManager(), itemsEmpty);
                 listView.setAdapter(adapterListviewEmpty);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/"+ itemsEmpty.get(position).owner));
+                        startActivity(browserIntent);
+                    }
+                });
                 adapterListviewEmpty.notifyDataSetChanged();
                 //showToast("Data Updated");
             }
@@ -370,7 +384,6 @@ public class FragmentLinks extends Fragment {
             }
         });
     }
-
 
     private void parseJSON(String jsonStr) {
         if (jsonStr != null) {

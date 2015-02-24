@@ -93,7 +93,8 @@
         android:layout_below="@+id/layout_main_bar"
         android:layout_centerHorizontal="true"
         android:text="As soon as you like one of our merchants&apos; instagrams, we will show linked products here! Find some of our featured merchants below:"
-        android:textColor="#2191c1" />
+        android:textColor="#2191c1"
+        android:padding="5dp" />
 
 
 </RelativeLayout>
