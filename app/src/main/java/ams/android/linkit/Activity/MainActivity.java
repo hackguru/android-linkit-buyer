@@ -12,8 +12,6 @@ import ams.android.linkit.Fragment.FragmentWebView;
 import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
-import me.leolin.shortcutbadger.ShortcutBadgeException;
-import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MainActivity extends Activity implements FragmentWebView.BackHandlerInterface {
 
@@ -29,21 +27,14 @@ public class MainActivity extends Activity implements FragmentWebView.BackHandle
 
         try {
             ((GlobalApplication) getApplication()).setBadgetCount(0);
-            int count = ((GlobalApplication) getApplication()).getBadgeCount();
-            ShortcutBadger.setBadge(getApplicationContext(), count);
-            ((GlobalApplication) getApplication()).setBadgetCount(count + 1);
-        } catch (ShortcutBadgeException e) {
+//            int count = ((GlobalApplication) getApplication()).getBadgeCount();
+//            ShortcutBadger.setBadge(getApplicationContext(), count);
+//            ((GlobalApplication) getApplication()).setBadgetCount(count + 1);
+        } catch (Exception e) {
             //handle the Exception
         }
 
-        if (savedInstanceState != null) {
-//            FragmentIntro f1 = new FragmentIntro();
-//            FragmentTransaction ft = getFragmentManager().beginTransaction();
-//            ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
-//            ft.replace(R.id.container, f1, "Intro");
-//            //ft.addToBackStack("Intro");
-//            ft.commit();
-        } else {
+        if (savedInstanceState == null) {
             if (!getIntent().hasExtra("RunByNoti")) {
                 checkLogin();
             } else {
