@@ -126,8 +126,7 @@ public class NotiHeadService extends Service {
         try {
             int count = ((GlobalApplication) getApplication()).getBadgeCount();
             ShortcutBadger.setBadge(getApplicationContext(), count);
-            ((GlobalApplication) getApplication()).setBadgetCount(count + 1
-            );
+            ((GlobalApplication) getApplication()).setBadgetCount(count + 1);
         } catch (ShortcutBadgeException e) {
             //handle the Exception
         }

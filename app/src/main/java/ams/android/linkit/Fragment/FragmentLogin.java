@@ -43,8 +43,7 @@ public class FragmentLogin extends Fragment {
     WebView webView;
 
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
         webView = (WebView) rootView.findViewById(R.id.webView);
         webView.clearCache(true);

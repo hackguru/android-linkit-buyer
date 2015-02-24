@@ -5,6 +5,8 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,17 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.process.BitmapProcessor;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONObject;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,6 +42,7 @@ import java.util.List;
 import ams.android.linkit.Fragment.FragmentWebView;
 import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
+import ams.android.linkit.Tools.GlobalApplication;
 
 /**
  * Created by Aidin on 2/3/2015.
@@ -110,6 +124,7 @@ public class AdapterListview extends BaseAdapter {
         imgLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new postOpenedAsync().execute(items.get(position).mediaID);
                 FragmentWebView f1 = FragmentWebView.newInstance(items.get(position));
                 FragmentTransaction ft = fragmentManager.beginTransaction();
                 ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
@@ -167,36 +182,30 @@ public class AdapterListview extends BaseAdapter {
             super.onLoadingCancelled(imageUri, view);
         }
     }
-	
-    private class postDescriptionAsync extends AsyncTask<DescriptionData, Void, String> {
+
+    private class postOpenedAsync extends AsyncTask<String, Void, String> {
         @Override
-        protected String doInBackground(DescriptionData... descriptionDatas) {
+        protected String doInBackground(String... data) {
             HttpClient client = new DefaultHttpClient();
             HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000); //Timeout Limit
             HttpResponse response;
             JSONObject json = new JSONObject();
 
             try {
-                String urlJSON = activity.getResources().getString(R.string.BASE_URL).toString() + "media/match/" + items.get(descriptionDatas[0].position).mediaID;
+                String urlJSON = activity.getResources().getString(R.string.BASE_URL).toString() + "users/" + ((GlobalApplication) activity.getApplication()).getUserId() + "/opened/" + data[0];
                 HttpPost post = new HttpPost(urlJSON);
                 post.addHeader("token", ((GlobalApplication) activity.getApplication()).getRegistrationId());
                 post.addHeader("device", "android");
-                post.addHeader("userType", "merchant");
-                json.put("productDescription", descriptionDatas[0].description);
+                post.addHeader("userType", "buyer");
                 StringEntity se = new StringEntity(json.toString());
                 se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
                 post.setEntity(se);
                 response = client.execute(post);
-
                     /*Checking response */
                 InputStream in = null;
                 if (response != null) {
                     in = response.getEntity().getContent(); //Get the data in the entity
                 }
-
-                items.get(descriptionDatas[0].position).productDescription = descriptionDatas[0].description;
-
-                Log.i("linkit Response : " + descriptionDatas[0].description + " => ", in.toString());
                 return "OK";
 
             } catch (Exception e) {

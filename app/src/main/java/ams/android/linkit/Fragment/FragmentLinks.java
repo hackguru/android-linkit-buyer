@@ -1,4 +1,4 @@
-package ams.android.linkitmerchant.Fragment;
+package ams.android.linkit.Fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -32,11 +32,12 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import ams.android.linkitmerchant.Adapter.AdapterListview;
-import ams.android.linkitmerchant.Model.LinkitObject;
-import ams.android.linkitmerchant.R;
-import ams.android.linkitmerchant.Tools.GlobalApplication;
-import ams.android.linkitmerchant.Tools.myListView;
+import ams.android.linkit.Adapter.AdapterListview;
+import ams.android.linkit.Adapter.AdapterListviewEmpty;
+import ams.android.linkit.Model.LinkitObject;
+import ams.android.linkit.R;
+import ams.android.linkit.Tools.GlobalApplication;
+import ams.android.linkit.Tools.myListView;
 
 
 /**
@@ -45,7 +46,9 @@ import ams.android.linkitmerchant.Tools.myListView;
 public class FragmentLinks extends Fragment {
 
     static ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
+    static ArrayList<LinkitObject> itemsEmpty = new ArrayList<LinkitObject>();
     static AdapterListview adapterListview;
+    static AdapterListviewEmpty adapterListviewEmpty;
     myListView listView;
     String userID, regID;
     LayoutInflater ginflater;
@@ -71,8 +74,11 @@ public class FragmentLinks extends Fragment {
         regID = ((GlobalApplication) getActivity().getApplication()).getRegistrationId();
         ginflater = inflater;
         grootView = rootView;
+        listView = (myListView) rootView.findViewById(R.id.listView);
+        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         ImageButton btnLogout = (ImageButton) rootView.findViewById(R.id.btn_logout);
         layWaiting = (RelativeLayout) rootView.findViewById(R.id.lay_waiting);
+
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,8 +104,6 @@ public class FragmentLinks extends Fragment {
             }
         });
 
-
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -113,7 +117,6 @@ public class FragmentLinks extends Fragment {
 
         adapterListview = new AdapterListview(getActivity(), getFragmentManager(), items);
 
-        listView = (myListView) rootView.findViewById(R.id.listView);
         listView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
         listView.setOnDetectScrollListener(new myListView.OnDetectScrollListener() {
             @Override
@@ -162,7 +165,7 @@ public class FragmentLinks extends Fragment {
         AsyncHttpClient client = new AsyncHttpClient();
         client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
         client.addHeader("device", "android");
-        client.addHeader("userType", "merchant");
+        client.addHeader("userType", "buyer");
         String URL = getResources().getString(R.string.BASE_URL) + "users/updateregid";
         client.post(URL, new AsyncHttpResponseHandler() {
             @Override
@@ -211,7 +214,7 @@ public class FragmentLinks extends Fragment {
 
         client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
         client.addHeader("device", "android");
-        client.addHeader("userType", "merchant");
+        client.addHeader("userType", "buyer");
 
         if (startDate != null) {
             requestParams.add("startDate", startDate);
@@ -225,7 +228,7 @@ public class FragmentLinks extends Fragment {
             requestParams.add("count", count);
         }
 
-        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/postedmedias";
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
             public void onStart() {
@@ -260,7 +263,7 @@ public class FragmentLinks extends Fragment {
 
         client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
         client.addHeader("device", "android");
-        client.addHeader("userType", "merchant");
+        client.addHeader("userType", "buyer");
         if (startDate != null) {
             requestParams.add("startDate", startDate);
         }
@@ -272,7 +275,7 @@ public class FragmentLinks extends Fragment {
         if (count != null) {
             requestParams.add("count", count);
         }
-        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/postedmedias";
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
             public void onStart() {
@@ -286,21 +289,24 @@ public class FragmentLinks extends Fragment {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                adapterListview.notifyDataSetChanged();
-                swipeLayout.setRefreshing(false);
 
-                if (currentItem != null) {
-                    FragmentWebView f1 = FragmentWebView.newInstance(items.get(0));
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
-                    ft.add(R.id.container, f1, "WebView");
-                    ft.addToBackStack("WebView");
-                    ft.commit();
-                    currentItem = null;
+                if (items.isEmpty()) {
+                    refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
+
+                } else {
+                    adapterListview.notifyDataSetChanged();
+                    swipeLayout.setRefreshing(false);
+                    if (currentItem != null) {
+                        FragmentWebView f1 = FragmentWebView.newInstance(items.get(0));
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                        ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
+                        ft.add(R.id.container, f1, "WebView");
+                        ft.addToBackStack("WebView");
+                        ft.commit();
+                        currentItem = null;
+                    }
                 }
-
-
                 //showToast("Data Updated");
             }
 
@@ -314,6 +320,57 @@ public class FragmentLinks extends Fragment {
             }
         });
     }
+
+    public void refreshDataEmpty(String startDate, String endDate, String count) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams requestParams = new RequestParams();
+
+        client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
+        client.addHeader("device", "android");
+        client.addHeader("userType", "buyer");
+        if (startDate != null) {
+            requestParams.add("startDate", startDate);
+        }
+
+        if (endDate != null) {
+            requestParams.add("endDate", endDate);
+        }
+
+        if (count != null) {
+            requestParams.add("count", count);
+        }
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/recommendedMerchants";
+        client.get(URL, requestParams, new AsyncHttpResponseHandler() {
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                itemsEmpty.clear();
+                try {
+                    parseJSONEmpty(new String(response, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                adapterListviewEmpty = new AdapterListviewEmpty(getActivity(), getFragmentManager(), itemsEmpty);
+                listView.setAdapter(adapterListviewEmpty);
+                adapterListviewEmpty.notifyDataSetChanged();
+                //showToast("Data Updated");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                //Log.e("linkit-merchant", "ERR : " + errorResponse.toString());
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+            }
+        });
+    }
+
 
     private void parseJSON(String jsonStr) {
         if (jsonStr != null) {
@@ -329,29 +386,42 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.mediaID = "";
                     }
+
+
+                    if (item.getJSONObject("media").getJSONObject("owner").has("username")) {
+                        myobject.owner = item.getJSONObject("media").getJSONObject("owner").getString("username");
+                    } else {
+                        myobject.owner = "";
+                    }
+                    if (item.getJSONObject("media").getJSONObject("owner").has("profilePicture")) {
+                        myobject.ownerProfilePic = item.getJSONObject("media").getJSONObject("owner").getString("profilePicture");
+                    } else {
+                        myobject.ownerProfilePic = "";
+                    }
+
                     // date
-                    if (item.has("created")) {
-                        myobject.createdDate = item.getString("created");
+                    if (item.getJSONObject("media").has("created")) {
+                        myobject.createdDate = item.getJSONObject("media").getString("created");
                     } else {
                         myobject.createdDate = "";
                     }
-                    if (item.has("productDescription")) {
-                        myobject.productDescription = item.getString("productDescription");
+                    if (item.getJSONObject("media").has("productDescription")) {
+                        myobject.productDescription = item.getJSONObject("media").getString("productDescription");
                     } else {
                         myobject.productDescription = "";
                     }
-                    if (item.has("linkToProduct")) {
-                        myobject.productLink = item.getString("linkToProduct");
+                    if (item.getJSONObject("media").has("linkToProduct")) {
+                        myobject.productLink = item.getJSONObject("media").getString("linkToProduct");
                     } else {
                         myobject.productLink = "";
                     }
-                    if (item.has("productLinkScreenshot")) {
-                        myobject.linkSrceenShot = item.getString("productLinkScreenshot");
+                    if (item.getJSONObject("media").has("productLinkScreenshot")) {
+                        myobject.linkSrceenShot = item.getJSONObject("media").getString("productLinkScreenshot");
                     } else {
                         myobject.linkSrceenShot = "";
                     }
-                    if (item.getJSONObject("images").getJSONObject("standard_resolution").has("url")) {
-                        myobject.imageUrl = item.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
+                    if (item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").has("url")) {
+                        myobject.imageUrl = item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").getString("url");
                     } else {
                         myobject.imageUrl = "";
                     }
@@ -365,4 +435,48 @@ public class FragmentLinks extends Fragment {
             //Log.e(TAG, "Couldn't get any data from the url");
         }
     }
+
+    private void parseJSONEmpty(String jsonStr) {
+        if (jsonStr != null) {
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                JSONArray feeds = jsonObj.getJSONArray("results");
+                for (int i = 0; i < feeds.length(); i++) {
+                    JSONObject item = feeds.getJSONObject(i);
+                    LinkitObject myobject = new LinkitObject();
+
+                    if (item.has("_id")) {
+                        myobject.mediaID = item.getString("_id");
+                    } else {
+                        myobject.mediaID = "";
+                    }
+
+                    if (item.has("username")) {
+                        myobject.owner = item.getString("username");
+                    } else {
+                        myobject.owner = "";
+                    }
+                    if (item.has("profilePicture")) {
+                        myobject.ownerProfilePic = item.getString("profilePicture");
+                    } else {
+                        myobject.ownerProfilePic = "";
+                    }
+
+                    if (item.has("bio")) {
+                        myobject.productDescription = item.getString("bio");
+                    } else {
+                        myobject.productDescription = "";
+                    }
+
+                    itemsEmpty.add(myobject);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            //Log.e(TAG, "Couldn't get any data from the url");
+        }
+    }
+
 }
