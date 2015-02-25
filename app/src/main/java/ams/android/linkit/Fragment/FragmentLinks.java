@@ -289,6 +289,7 @@ public class FragmentLinks extends Fragment {
                 }
 
                 if (items.isEmpty()) {
+                    txtEmptyInfo.setVisibility(View.VISIBLE);
                     refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
 
                 } else {

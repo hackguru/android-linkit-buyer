@@ -74,9 +74,11 @@ public class FragmentLogin extends Fragment {
         imageReload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new hasActiveInternetConnectionTask().execute();
+                setUrl();
+                //new hasActiveInternetConnectionTask().execute();
             }
         });
+        imageReload.bringToFront();
 
         CookieSyncManager.createInstance(getActivity());
         CookieManager cookieManager = CookieManager.getInstance();
@@ -100,8 +102,7 @@ public class FragmentLogin extends Fragment {
 
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                imageReload.setVisibility(View.VISIBLE);
-                imageReload.bringToFront();
+
                 webView.loadData("<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>", "text/html", "UTF-8");
             }
 
@@ -146,7 +147,7 @@ public class FragmentLogin extends Fragment {
         @Override
         protected void onPostExecute(Boolean result) {
             if (result) {
-                setUrl();
+
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Internet connection required", Toast.LENGTH_SHORT).show();
             }
@@ -160,7 +161,6 @@ public class FragmentLogin extends Fragment {
     private void setUrl() {
         String url = getResources().getString(R.string.BASE_URL) + "users/auth/buyer/android/" + ((GlobalApplication) getActivity().getApplication()).getRegistrationId();
         webView.loadUrl(url);
-        imageReload.setVisibility(View.INVISIBLE);
     }
 
     private void registerInBackground() {

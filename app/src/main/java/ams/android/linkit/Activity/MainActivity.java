@@ -12,6 +12,7 @@ import ams.android.linkit.Fragment.FragmentWebView;
 import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MainActivity extends Activity implements FragmentWebView.BackHandlerInterface {
 
@@ -27,30 +28,27 @@ public class MainActivity extends Activity implements FragmentWebView.BackHandle
 
         try {
             ((GlobalApplication) getApplication()).setBadgetCount(0);
-//            int count = ((GlobalApplication) getApplication()).getBadgeCount();
-//            ShortcutBadger.setBadge(getApplicationContext(), count);
-//            ((GlobalApplication) getApplication()).setBadgetCount(count + 1);
+            ShortcutBadger.setBadge(getApplicationContext(), 0);
         } catch (Exception e) {
-            //handle the Exception
         }
 
-        if (savedInstanceState == null) {
-            if (!getIntent().hasExtra("RunByNoti")) {
+        if (!getIntent().hasExtra("RunByNoti")) {
+            if (savedInstanceState == null) {
                 checkLogin();
-            } else {
-                LinkitObject myObject = new LinkitObject();
-                myObject.productLink = getIntent().getExtras().getString("productLink");
-                myObject.imageUrl = getIntent().getExtras().getString("imageUrl");
-                myObject.productDescription = getIntent().getExtras().getString("text");
-                myObject.linkSrceenShot = getIntent().getExtras().getString("linkSrceenShot");
-                new FragmentLinks();
-                FragmentLinks f1 = FragmentLinks.newInstance(myObject);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, f1, "Links");
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.addToBackStack("Links");
-                ft.commit();
             }
+        } else {
+            LinkitObject myObject = new LinkitObject();
+            myObject.productLink = getIntent().getExtras().getString("productLink");
+            myObject.imageUrl = getIntent().getExtras().getString("imageUrl");
+            myObject.productDescription = getIntent().getExtras().getString("text");
+            myObject.linkSrceenShot = getIntent().getExtras().getString("linkSrceenShot");
+            new FragmentLinks();
+            FragmentLinks f1 = FragmentLinks.newInstance(myObject);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.container, f1, "Links");
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.addToBackStack("Links");
+            ft.commit();
         }
     }
 

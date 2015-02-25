@@ -20,14 +20,17 @@
         android:layout_above="@+id/imgIntro" />
 
     <ImageView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imgRefresh"
         android:layout_centerHorizontal="true"
         android:layout_alignTop="@+id/webViewLogin"
-        android:layout_alignBottom="@+id/webViewLogin"
         android:src="@drawable/refresh"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        android:layout_alignRight="@+id/webViewLogin"
+        android:visibility="visible"
+        android:layout_margin="10dp"
+        android:clickable="true" />
 
     <ImageView
         android:layout_width="fill_parent"
