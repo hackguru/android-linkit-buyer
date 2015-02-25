@@ -21,7 +21,6 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.core.process.BitmapProcessor;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -53,7 +52,7 @@ public class AdapterListview extends BaseAdapter {
     Context context;
     FragmentManager fragmentManager;
     ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
-    ImageLoader imageLoader = ImageLoader.getInstance();
+    static ImageLoader imageLoader = ImageLoader.getInstance();
     DisplayImageOptions options;
     ImageLoadingListener imageListener;
 
@@ -66,14 +65,16 @@ public class AdapterListview extends BaseAdapter {
                 .resetViewBeforeLoading(true)
                 .showImageOnFail(R.drawable.fail)
                 .showImageOnLoading(R.drawable.loading)
-                .showImageForEmptyUri(R.drawable.unlink).cacheInMemory(true)
-                .preProcessor(new BitmapProcessor() {
-                    @Override
-                    public Bitmap process(Bitmap bitmap) {
-                        return Bitmap.createScaledBitmap(bitmap, 400, 400, true);
-                    }
-                })
-                .cacheOnDisk(true).build();
+                .showImageForEmptyUri(R.drawable.unlink)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+//                .preProcessor(new BitmapProcessor() {
+//                    @Override
+//                    public Bitmap process(Bitmap bitmap) {
+//                        return Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+//                    }
+//                })
+                .build();
 
         imageListener = new ImageDisplayListener();
         if (!imageLoader.isInited()) {

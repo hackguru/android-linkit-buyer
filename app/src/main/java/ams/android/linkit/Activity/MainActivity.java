@@ -26,12 +26,15 @@ public class MainActivity extends Activity implements FragmentWebView.BackHandle
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
+
+        // clear Badget Counter
         try {
             ((GlobalApplication) getApplication()).setBadgetCount(0);
             ShortcutBadger.setBadge(getApplicationContext(), 0);
         } catch (Exception e) {
         }
 
+        // check if Notification Received
         if (!getIntent().hasExtra("RunByNoti")) {
             if (savedInstanceState == null) {
                 checkLogin();

@@ -6,13 +6,10 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.CardView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -41,6 +37,7 @@ import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
 import ams.android.linkit.Tools.myListView;
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 
 /**
@@ -82,7 +79,7 @@ public class FragmentLinks extends Fragment {
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         ImageButton btnLogout = (ImageButton) rootView.findViewById(R.id.btn_logout);
         layWaiting = (RelativeLayout) rootView.findViewById(R.id.lay_waiting);
-        txtEmptyInfo = (TextView)rootView.findViewById(R.id.txtEmptyInfo);
+        txtEmptyInfo = (TextView) rootView.findViewById(R.id.txtEmptyInfo);
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +88,7 @@ public class FragmentLinks extends Fragment {
                 builder
                         .setTitle("Logout")
                         .setMessage("Do you want to logout?")
-                        .setIcon(R.drawable.linkit)
+                        .setIcon(R.drawable.ic_launcher)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 serverLogout();
@@ -145,18 +142,18 @@ public class FragmentLinks extends Fragment {
         return rootView;
     }
 
-    private void showToast(String text) {
-        View layout = ginflater.inflate(R.layout.toast, (ViewGroup) grootView.findViewById(R.id.toast_layout_root));
-        final CardView card = (CardView) layout.findViewById(R.id.card_view_toast);
-        card.setCardBackgroundColor(Color.parseColor("#2191c1"));
-        TextView textView = (TextView) layout.findViewById(R.id.text);
-        textView.setText(text);
-        Toast toast = new Toast(getActivity().getApplicationContext());
-        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.BOTTOM, 0, 0);
-        toast.setDuration(Toast.LENGTH_SHORT);
-        toast.setView(layout);
-        toast.show();
-    }
+//    private void showToast(String text) {
+//        View layout = ginflater.inflate(R.layout.toast, (ViewGroup) grootView.findViewById(R.id.toast_layout_root));
+//        final CardView card = (CardView) layout.findViewById(R.id.card_view_toast);
+//        card.setCardBackgroundColor(Color.parseColor("#2191c1"));
+//        TextView textView = (TextView) layout.findViewById(R.id.text);
+//        textView.setText(text);
+//        Toast toast = new Toast(getActivity().getApplicationContext());
+//        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.BOTTOM, 0, 0);
+//        toast.setDuration(Toast.LENGTH_SHORT);
+//        toast.setView(layout);
+//        toast.show();
+//    }
 
     public void serverLogout() {
         AsyncHttpClient client = new AsyncHttpClient();
@@ -173,7 +170,12 @@ public class FragmentLinks extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 ((GlobalApplication) getActivity().getApplication()).clearAllSettings();
-                showToast("Logout");
+                try {
+                    ((GlobalApplication) getActivity().getApplicationContext()).setBadgetCount(0);
+                    ShortcutBadger.setBadge(getActivity().getApplicationContext(), 0);
+                } catch (Exception e) {
+                }
+                //showToast("Logout");
                 FragmentLogin f1 = new FragmentLogin();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
@@ -366,7 +368,7 @@ public class FragmentLinks extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/"+ itemsEmpty.get(position).owner));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/" + itemsEmpty.get(position).owner));
                         startActivity(browserIntent);
                     }
                 });

@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,7 +16,7 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -31,8 +30,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
@@ -49,15 +46,17 @@ public class FragmentLogin extends Fragment {
     Context context;
     WebView webView;
     ImageView imageReload;
-
+    ProgressBar progressBarLoad;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        if (!(getActivity().getRequestedOrientation() ==ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
+        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
         webView = (WebView) rootView.findViewById(R.id.webViewLogin);
         imageReload = (ImageView) rootView.findViewById(R.id.imgRefresh);
+        progressBarLoad = (ProgressBar) rootView.findViewById(R.id.progressBar_load);
+
         ImageView imagePlay = (ImageView) rootView.findViewById(R.id.imgPlay);
         imagePlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,11 +78,9 @@ public class FragmentLogin extends Fragment {
             }
         });
         imageReload.bringToFront();
-
         CookieSyncManager.createInstance(getActivity());
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.removeAllCookie();
-
         context = getActivity().getApplicationContext();
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(context);
@@ -97,17 +94,17 @@ public class FragmentLogin extends Fragment {
         }
         WebViewClient wvc = new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return false; // then it is not handled by default action
+                return false;
             }
 
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-
                 webView.loadData("<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>", "text/html", "UTF-8");
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                progressBarLoad.setVisibility(View.INVISIBLE);
                 try {
                     if (url.startsWith(getResources().getString(R.string.BASE_URL) + "users/insta-buyer-cb")) {
                         login(getResources().getString(R.string.BASE_URL) + "users/userId");
@@ -117,50 +114,50 @@ public class FragmentLogin extends Fragment {
                 super.onPageFinished(view, url);
             }
         };
-
         webView.setWebViewClient(wvc);
         return rootView;
     }
 
-    class hasActiveInternetConnectionTask extends AsyncTask<String, String, Boolean> {
-        @Override
-        protected Boolean doInBackground(String... params) {
-            if (isNetworkAvailable(context)) {
-                try {
-                    HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
-                    urlc.setRequestProperty("User-Agent", "Test");
-                    urlc.setRequestProperty("Connection", "close");
-                    urlc.setConnectTimeout(1500);
-                    urlc.connect();
+//    class hasActiveInternetConnectionTask extends AsyncTask<String, String, Boolean> {
+//        @Override
+//        protected Boolean doInBackground(String... params) {
+//            if (isNetworkAvailable(context)) {
+//                try {
+//                    HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
+//                    urlc.setRequestProperty("User-Agent", "Test");
+//                    urlc.setRequestProperty("Connection", "close");
+//                    urlc.setConnectTimeout(1500);
+//                    urlc.connect();
+//
+//                    return (urlc.getResponseCode() == 200);
+//                } catch (IOException e) {
+//                    Log.e(TAG, "Error checking internet connection", e);
+//                    return false;
+//                }
+//            } else {
+//                Log.d(TAG, "No network available!");
+//                return false;
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean result) {
+//            if (result) {
+//
+//            } else {
+//                Toast.makeText(getActivity().getApplicationContext(), "Internet connection required", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 
-                    return (urlc.getResponseCode() == 200);
-                } catch (IOException e) {
-                    Log.e(TAG, "Error checking internet connection", e);
-                    return false;
-                }
-            } else {
-                Log.d(TAG, "No network available!");
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (result) {
-
-            } else {
-                Toast.makeText(getActivity().getApplicationContext(), "Internet connection required", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    public static boolean isNetworkAvailable(Context context) {
-        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
-    }
+//    public static boolean isNetworkAvailable(Context context) {
+//        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
+//    }
 
     private void setUrl() {
         String url = getResources().getString(R.string.BASE_URL) + "users/auth/buyer/android/" + ((GlobalApplication) getActivity().getApplication()).getRegistrationId();
         webView.loadUrl(url);
+        progressBarLoad.setVisibility(View.VISIBLE);
     }
 
     private void registerInBackground() {
@@ -218,7 +215,6 @@ public class FragmentLogin extends Fragment {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                // called when response HTTP status is "200 OK"
                 try {
                     parseJSON(new String(response, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
@@ -242,7 +238,6 @@ public class FragmentLogin extends Fragment {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 ((GlobalApplication) getActivity().getApplication()).setUserId(jsonObj.getString("userId"));
-
                 FragmentLinks f1 = new FragmentLinks();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, f1); // f1_container is your FrameLayout container

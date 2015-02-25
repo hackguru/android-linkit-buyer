@@ -71,8 +71,6 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="30dp"
-            android:layout_toRightOf="@+id/img_insta_preview"
             android:background="#00ffffff"
             android:scaleType="fitCenter"
             android:src="@drawable/left"
@@ -84,8 +82,6 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="30dp"
-            android:layout_toRightOf="@+id/btn_back"
             android:background="#00ffffff"
             android:scaleType="fitCenter"
             android:src="@drawable/right"
@@ -96,14 +92,20 @@
             android:id="@+id/btn_linkout"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="60dp"
-            android:layout_toRightOf="@+id/btn_forward"
             android:background="#00ffffff"
             android:scaleType="fitCenter"
             android:src="@drawable/linkout"
             android:text=">"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+
+        <FrameLayout
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"></FrameLayout>
 
     </RelativeLayout>
 
