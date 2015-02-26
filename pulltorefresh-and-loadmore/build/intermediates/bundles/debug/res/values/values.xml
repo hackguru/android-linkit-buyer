@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/colors.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/colors.xml -->
     <eat-comment/>
     <integer-array name="gplus_colors">
         <item>@color/gplus_color_1</item>
@@ -16,7 +16,7 @@
     <color name="gplus_color_4">#b23424</color>
     <color name="gray_1">#C0C0C0</color>
     <color name="gray_2">#AFAFAF</color>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/strings.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/strings.xml -->
     <eat-comment/>
     <string name="app_name">Loadmore</string>
     <string name="hello">Hello World, LoadMoreListView!</string>
@@ -24,7 +24,7 @@
     <string name="pull_to_refresh_refreshing_label">Loading...</string>
     <string name="pull_to_refresh_release_label">Release to refresh...</string>
     <string name="pull_to_refresh_tap_label">Tap to refresh...</string>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/styles.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/styles.xml -->
     <eat-comment/>
     <style name="AppThemePAR" parent="android:Theme.Holo.Light">
 

@@ -4,12 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.Shader;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -60,39 +55,39 @@ public class NotiHeadService extends Service {
     Handler handler;
     private WindowManager windowManager;
 
-    public static Bitmap drawShadow(Bitmap bitmap, int leftRightThk, int bottomThk, int padTop) {
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-
-        int newW = w - (leftRightThk * 2);
-        int newH = h - (bottomThk + padTop);
-
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(w, h, conf);
-        Bitmap sbmp = Bitmap.createScaledBitmap(bitmap, newW, newH, false);
-
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        Canvas c = new Canvas(bmp);
-
-        // Left
-        int leftMargin = (leftRightThk + 7) / 2;
-        Shader lshader = new LinearGradient(0, 0, leftMargin, 0, Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP);
-        paint.setShader(lshader);
-        c.drawRect(0, padTop, leftMargin, newH, paint);
-
-        // Right
-        Shader rshader = new LinearGradient(w - leftMargin, 0, w, 0, Color.BLACK, Color.TRANSPARENT, Shader.TileMode.CLAMP);
-        paint.setShader(rshader);
-        c.drawRect(newW, padTop, w, newH, paint);
-
-        // Bottom
-        Shader bshader = new LinearGradient(0, newH, 0, bitmap.getHeight(), Color.BLACK, Color.TRANSPARENT, Shader.TileMode.CLAMP);
-        paint.setShader(bshader);
-        c.drawRect(leftMargin - 3, newH, newW + leftMargin + 3, bitmap.getHeight(), paint);
-        c.drawBitmap(sbmp, leftRightThk, 0, null);
-
-        return bmp;
-    }
+//    public static Bitmap drawShadow(Bitmap bitmap, int leftRightThk, int bottomThk, int padTop) {
+//        int w = bitmap.getWidth();
+//        int h = bitmap.getHeight();
+//
+//        int newW = w - (leftRightThk * 2);
+//        int newH = h - (bottomThk + padTop);
+//
+//        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+//        Bitmap bmp = Bitmap.createBitmap(w, h, conf);
+//        Bitmap sbmp = Bitmap.createScaledBitmap(bitmap, newW, newH, false);
+//
+//        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        Canvas c = new Canvas(bmp);
+//
+//        // Left
+//        int leftMargin = (leftRightThk + 7) / 2;
+//        Shader lshader = new LinearGradient(0, 0, leftMargin, 0, Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP);
+//        paint.setShader(lshader);
+//        c.drawRect(0, padTop, leftMargin, newH, paint);
+//
+//        // Right
+//        Shader rshader = new LinearGradient(w - leftMargin, 0, w, 0, Color.BLACK, Color.TRANSPARENT, Shader.TileMode.CLAMP);
+//        paint.setShader(rshader);
+//        c.drawRect(newW, padTop, w, newH, paint);
+//
+//        // Bottom
+//        Shader bshader = new LinearGradient(0, newH, 0, bitmap.getHeight(), Color.BLACK, Color.TRANSPARENT, Shader.TileMode.CLAMP);
+//        paint.setShader(bshader);
+//        c.drawRect(leftMargin - 3, newH, newW + leftMargin + 3, bitmap.getHeight(), paint);
+//        c.drawBitmap(sbmp, leftRightThk, 0, null);
+//
+//        return bmp;
+//    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -102,6 +97,7 @@ public class NotiHeadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         final String imageUrl = (String) intent.getExtras().get("imageUrl");
         final String linkSrceenShot = (String) intent.getExtras().get("linkSrceenShot");
         final String productLink = (String) intent.getExtras().get("productLink");
@@ -145,48 +141,84 @@ public class NotiHeadService extends Service {
 
 
         layoutInfo = (RelativeLayout) rootView.findViewById(R.id.lay_noti_text);
-        //RelativeLayout layClick = (RelativeLayout)rootView.findViewById(R.id.lay_noti_main);
+        RelativeLayout layClick = (RelativeLayout) rootView.findViewById(R.id.lay_noti_main);
         img = (ImageView) rootView.findViewById(R.id.img_noti);
         txtTitle = (TextView) rootView.findViewById(R.id.txtNotiTitle);
 
-        txtTitle.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
-            @Override
-            public void onSwipeRight() {
-                //Toast.makeText(getApplicationContext(), "Right", Toast.LENGTH_SHORT).show();
-//                new mainTask().run();
-//                timer.cancel();
-            }
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //if (event.getAction()==MotionEvent.ACTION_UP)
-                {
-                    //Toast.makeText(getApplicationContext(), "CLICK", Toast.LENGTH_SHORT).show();
-                    Intent myIntent = new Intent().setClass(NotiHeadService.this, MainActivity.class);
-                    myIntent.putExtra("RunByNoti", true);
-                    myIntent.putExtra("imageUrl", imageUrl);
-                    myIntent.putExtra("linkSrceenShot", linkSrceenShot);
-                    myIntent.putExtra("productLink", productLink);
-                    myIntent.putExtra("text", text);
-                    myIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(myIntent);
-
-                    new mainTask().run();
-                    timer.cancel();
-                }
-
-                return super.onTouch(v, event);
-
-            }
-        });
-
-        txtTitle.setOnClickListener(new View.OnClickListener() {
+        layClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Toast.makeText(getApplicationContext(), "click!", Toast.LENGTH_SHORT).show();
+                Intent myIntent = new Intent().setClass(NotiHeadService.this, MainActivity.class);
+                myIntent.putExtra("RunByNoti", true);
+                myIntent.putExtra("imageUrl", imageUrl);
+                myIntent.putExtra("linkSrceenShot", linkSrceenShot);
+                myIntent.putExtra("productLink", productLink);
+                myIntent.putExtra("text", text);
+                //myIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(myIntent);
 
+                new mainTask().run();
+                timer.cancel();
             }
         });
+
+//        layClick.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
+//            @Override
+//            public void onSwipeRight() {
+//                Toast.makeText(getApplicationContext(), "Right", Toast.LENGTH_SHORT).show();
+//                new mainTask().run();
+//                timer.cancel();
+//            }
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return true;
+//            }
+//
+//
+//        });
+
+
+//        txtTitle.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
+//            @Override
+//            public void onSwipeRight() {
+//                //Toast.makeText(getApplicationContext(), "Right", Toast.LENGTH_SHORT).show();
+////                new mainTask().run();
+////                timer.cancel();
+//            }
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                //if (event.getAction()==MotionEvent.ACTION_UP)
+//                {
+//                    //Toast.makeText(getApplicationContext(), "CLICK", Toast.LENGTH_SHORT).show();
+//                    Intent myIntent = new Intent().setClass(NotiHeadService.this, MainActivity.class);
+//                    myIntent.putExtra("RunByNoti", true);
+//                    myIntent.putExtra("imageUrl", imageUrl);
+//                    myIntent.putExtra("linkSrceenShot", linkSrceenShot);
+//                    myIntent.putExtra("productLink", productLink);
+//                    myIntent.putExtra("text", text);
+//                    //myIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//                    myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(myIntent);
+//
+//                    new mainTask().run();
+//                    timer.cancel();
+//                }
+//
+//                return super.onTouch(v, event);
+//
+//            }
+//        });
+//
+//        txtTitle.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
 
         imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(imageUrl, img, options, imageListener);

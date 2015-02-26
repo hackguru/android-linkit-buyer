@@ -13,7 +13,7 @@
 
 
         <ams.android.linkit.Tools.myListView
-            android:id="@+id/listView"
+	    android:id="@+id/listView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
@@ -24,6 +24,7 @@
             android:drawSelectorOnTop="false"
             android:scrollingCache="true"
             android:smoothScrollbar="true"
+            android:listSelector="@android:color/transparent"
             tools:listitem="@layout/item_list" />
 
         <TextView

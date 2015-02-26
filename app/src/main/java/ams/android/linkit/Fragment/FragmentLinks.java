@@ -138,22 +138,18 @@ public class FragmentLinks extends Fragment {
         });
         listView.setAdapter(adapterListview);
 
-        refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
+        //refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
         return rootView;
     }
 
-//    private void showToast(String text) {
-//        View layout = ginflater.inflate(R.layout.toast, (ViewGroup) grootView.findViewById(R.id.toast_layout_root));
-//        final CardView card = (CardView) layout.findViewById(R.id.card_view_toast);
-//        card.setCardBackgroundColor(Color.parseColor("#2191c1"));
-//        TextView textView = (TextView) layout.findViewById(R.id.text);
-//        textView.setText(text);
-//        Toast toast = new Toast(getActivity().getApplicationContext());
-//        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.BOTTOM, 0, 0);
-//        toast.setDuration(Toast.LENGTH_SHORT);
-//        toast.setView(layout);
-//        toast.show();
-//    }
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        swipeLayout.setRefreshing(true);
+        refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
+        //Toast.makeText(getActivity().getApplicationContext(),"resume",Toast.LENGTH_SHORT).show();
+    }
 
     public void serverLogout() {
         AsyncHttpClient client = new AsyncHttpClient();
@@ -295,8 +291,9 @@ public class FragmentLinks extends Fragment {
                     refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
 
                 } else {
-                    txtEmptyInfo.setVisibility(View.GONE);
+                    listView.setAdapter(adapterListview);
                     adapterListview.notifyDataSetChanged();
+                    txtEmptyInfo.setVisibility(View.GONE);
                     swipeLayout.setRefreshing(false);
                     if (currentItem != null) {
                         FragmentWebView f1 = FragmentWebView.newInstance(items.get(0));
@@ -356,12 +353,12 @@ public class FragmentLinks extends Fragment {
                     e.printStackTrace();
                 }
 
-                swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
-                    }
-                });
+//                swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//                    @Override
+//                    public void onRefresh() {
+//                        refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
+//                    }
+//                });
                 swipeLayout.setRefreshing(false);
                 adapterListviewEmpty = new AdapterListviewEmpty(getActivity(), getFragmentManager(), itemsEmpty);
                 listView.setAdapter(adapterListviewEmpty);
@@ -494,4 +491,16 @@ public class FragmentLinks extends Fragment {
         }
     }
 
+//    private void showToast(String text) {
+//        View layout = ginflater.inflate(R.layout.toast, (ViewGroup) grootView.findViewById(R.id.toast_layout_root));
+//        final CardView card = (CardView) layout.findViewById(R.id.card_view_toast);
+//        card.setCardBackgroundColor(Color.parseColor("#2191c1"));
+//        TextView textView = (TextView) layout.findViewById(R.id.text);
+//        textView.setText(text);
+//        Toast toast = new Toast(getActivity().getApplicationContext());
+//        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.BOTTOM, 0, 0);
+//        toast.setDuration(Toast.LENGTH_SHORT);
+//        toast.setView(layout);
+//        toast.show();
+//    }
 }

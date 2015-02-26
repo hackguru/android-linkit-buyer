@@ -14,7 +14,7 @@
     <RelativeLayout
         android:id="@+id/layout_item_top"
         android:layout_width="fill_parent"
-        android:layout_height="10dp">
+        android:layout_height="0dp">
 
     </RelativeLayout>
 
@@ -151,7 +151,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_item_info"
-        android:paddingTop="5dp">
+        android:paddingBottom="5dp">
 
         <FrameLayout
             android:layout_width="fill_parent"

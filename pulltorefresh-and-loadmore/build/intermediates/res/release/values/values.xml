@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/colors.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/colors.xml -->
     <eat-comment/>
     <integer-array name="gplus_colors">
         <item>@color/gplus_color_1</item>
@@ -9,10 +9,10 @@
         <item>@color/gplus_color_4</item>
     </integer-array>
     <color name="black">#000000</color>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
     <eat-comment/>
     <color name="cpb_default_color">#33b5e5</color>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/colors.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/colors.xml -->
     <eat-comment/>
     <color name="dark_slate_gray">#2F4F4F</color>
     <color name="gplus_color_1">#3e802f</color>
@@ -22,31 +22,31 @@
     <color name="gray_1">#C0C0C0</color>
     <color name="gray_2">#AFAFAF</color>
     <declare-styleable name="CircularProgressBar"><attr format="reference" name="cpbStyle"/><attr format="color" name="cpb_color"/><attr format="reference" name="cpb_colors"/><attr format="dimension" name="cpb_stroke_width"/><attr format="integer" name="cpb_min_sweep_angle"/><attr format="integer" name="cpb_max_sweep_angle"/><attr format="float" name="cpb_sweep_speed"/><attr format="float" name="cpb_rotation_speed"/></declare-styleable>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
     <eat-comment/>
     <dimen name="cpb_default_stroke_width">4dp</dimen>
     <integer name="cpb_default_max_sweep_angle">300</integer>
     <integer name="cpb_default_min_sweep_angle">20</integer>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/strings.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/strings.xml -->
     <eat-comment/>
     <string name="app_name">Loadmore</string>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
     <eat-comment/>
     <item format="float" name="cpb_default_rotation_speed" type="string">1</item>
     <item format="float" name="cpb_default_sweep_speed" type="string">1</item>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/strings.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/strings.xml -->
     <eat-comment/>
     <string name="hello">Hello World, LoadMoreListView!</string>
     <string name="pull_to_refresh_pull_label">Pull to refresh...</string>
     <string name="pull_to_refresh_refreshing_label">Loading...</string>
     <string name="pull_to_refresh_release_label">Release to refresh...</string>
     <string name="pull_to_refresh_tap_label">Tap to refresh...</string>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/styles.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/styles.xml -->
     <eat-comment/>
     <style name="AppThemePAR" parent="android:Theme.Holo.Light">
 
     </style>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
     <eat-comment/>
     <style name="CircularProgressBar" parent="android:Widget.Holo.ProgressBar">
         <item name="cpb_color">@color/cpb_default_color</item>
@@ -56,7 +56,7 @@
         <item name="cpb_sweep_speed">@string/cpb_default_sweep_speed</item>
         <item name="cpb_rotation_speed">@string/cpb_default_rotation_speed</item>
     </style>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/res/values/styles.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/res/values/styles.xml -->
     <eat-comment/>
     <style name="CircularThemeProgressBar" parent="android:Widget.Holo.ProgressBar">
         <item name="cpb_color">@color/cpb_default_color</item>
@@ -66,7 +66,7 @@
         <item name="cpb_sweep_speed">@string/cpb_default_sweep_speed</item>
         <item name="cpb_rotation_speed">@string/cpb_default_rotation_speed</item>
     </style>
-    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/LinkIT/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
+    <!-- From: file:/C:/Users/Aidin/AndroidStudioProjects/android-linkit-buyer/pulltorefresh-and-loadmore/build/intermediates/exploded-aar/com.github.castorflex.smoothprogressbar/library-circular/1.0.2/res/values/values.xml -->
     <eat-comment/>
     <style name="Theme.SmoothProgressBarDefaults" parent="android:Theme.Holo">
         <item name="cpbStyle">@style/CircularProgressBar</item>

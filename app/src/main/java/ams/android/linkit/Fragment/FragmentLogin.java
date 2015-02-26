@@ -81,6 +81,7 @@ public class FragmentLogin extends Fragment {
         CookieSyncManager.createInstance(getActivity());
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.removeAllCookie();
+
         context = getActivity().getApplicationContext();
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(context);
@@ -117,42 +118,6 @@ public class FragmentLogin extends Fragment {
         webView.setWebViewClient(wvc);
         return rootView;
     }
-
-//    class hasActiveInternetConnectionTask extends AsyncTask<String, String, Boolean> {
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            if (isNetworkAvailable(context)) {
-//                try {
-//                    HttpURLConnection urlc = (HttpURLConnection) (new URL("http://www.google.com").openConnection());
-//                    urlc.setRequestProperty("User-Agent", "Test");
-//                    urlc.setRequestProperty("Connection", "close");
-//                    urlc.setConnectTimeout(1500);
-//                    urlc.connect();
-//
-//                    return (urlc.getResponseCode() == 200);
-//                } catch (IOException e) {
-//                    Log.e(TAG, "Error checking internet connection", e);
-//                    return false;
-//                }
-//            } else {
-//                Log.d(TAG, "No network available!");
-//                return false;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean result) {
-//            if (result) {
-//
-//            } else {
-//                Toast.makeText(getActivity().getApplicationContext(), "Internet connection required", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
-//    public static boolean isNetworkAvailable(Context context) {
-//        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
-//    }
 
     private void setUrl() {
         String url = getResources().getString(R.string.BASE_URL) + "users/auth/buyer/android/" + ((GlobalApplication) getActivity().getApplication()).getRegistrationId();

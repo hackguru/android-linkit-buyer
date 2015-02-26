@@ -3,29 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#cccccc"
-    android:orientation="vertical">
-
-    <RelativeLayout
-        android:id="@+id/lay_topBar"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#f6f6f6"
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp">
-
-        <ProgressBar
-            android:id="@+id/progressBar_load"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="4dp"
-            android:layout_alignParentBottom="false"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:indeterminate="true"
-            android:max="100"
-            android:progress="50" />
-
-    </RelativeLayout>
+    android:orientation="vertical"
+    android:touchscreenBlocksFocus="true"
+    android:clickable="true">
 
     <WebView
         android:id="@+id/webView_Content"
@@ -33,11 +13,22 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/lay_bottomBar"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/lay_topBar"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp" />
 
+
+    <ProgressBar
+        android:id="@+id/progressBar_load"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="4dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:indeterminate="true"
+        android:max="100"
+        android:progress="50" />
 
     <RelativeLayout
         android:id="@+id/lay_bottomBar"
@@ -47,46 +38,54 @@
         android:background="#f6f6f6"
         android:clickable="true"
         android:gravity="clip_vertical"
-        android:paddingBottom="5dp"
-        android:paddingLeft="20dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="2dp"
         android:paddingRight="20dp"
-        android:paddingTop="5dp">
+        android:paddingTop="2dp">
 
         <ImageView
             android:id="@+id/img_insta_preview"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_alignBottom="@+id/btn_back"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/btn_back"
             android:adjustViewBounds="false"
             android:baselineAlignBottom="false"
             android:cropToPadding="false"
             android:padding="0dp"
-            android:scaleType="fitCenter" />
-
-        <ImageButton
-            android:id="@+id/btn_back"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:background="#00ffffff"
             android:scaleType="fitCenter"
-            android:src="@drawable/left"
-            android:text="&lt;"
-            android:visibility="visible" />
+            android:layout_alignBottom="@+id/btn_linkout"
+            android:layout_alignTop="@+id/btn_linkout" />
 
-        <ImageButton
-            android:id="@+id/btn_forward"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:background="#00ffffff"
-            android:scaleType="fitCenter"
-            android:src="@drawable/right"
-            android:text=">"
-            android:visibility="visible" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerVertical="true"
+                android:background="#00ffffff"
+                android:scaleType="fitCenter"
+                android:src="@drawable/left"
+                android:text="&lt;"
+                android:visibility="visible"
+                android:layout_marginRight="50dp" />
+
+            <ImageButton
+                android:id="@+id/btn_forward"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerVertical="true"
+                android:background="#00ffffff"
+                android:scaleType="fitCenter"
+                android:src="@drawable/right"
+                android:text=">"
+                android:visibility="visible" />
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/btn_linkout"
@@ -100,12 +99,6 @@
             android:visibility="visible"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />
-
-        <FrameLayout
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"></FrameLayout>
 
     </RelativeLayout>
 

@@ -2,13 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
     tools:context="ams.android.linkitmerchant.Fragment.FragmentIntro"
     android:background="#ffffff">
 
     <VideoView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         android:id="@+id/videoViewIntro" />
 
 </RelativeLayout>

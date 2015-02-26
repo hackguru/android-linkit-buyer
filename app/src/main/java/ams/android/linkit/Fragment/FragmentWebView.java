@@ -69,7 +69,7 @@ public abstract class FragmentWebView extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_webview, container, false);
         vistaWeb = (WebView) rootView.findViewById(R.id.webView_Content);
         final ProgressBar progressBarLoad = (ProgressBar) rootView.findViewById(R.id.progressBar_load);
-        RelativeLayout layTopBar = (RelativeLayout) rootView.findViewById(R.id.lay_topBar);
+        RelativeLayout layBottomBar = (RelativeLayout) rootView.findViewById(R.id.lay_bottomBar);
         btnBack = (ImageButton) rootView.findViewById(R.id.btn_back);
         btnForward = (ImageButton) rootView.findViewById(R.id.btn_forward);
         btnLinkout = (ImageButton) rootView.findViewById(R.id.btn_linkout);
@@ -94,7 +94,7 @@ public abstract class FragmentWebView extends Fragment {
         }
         imageLoader = ImageLoader.getInstance();
 
-        ViewTreeObserver vto = layTopBar.getViewTreeObserver();
+        ViewTreeObserver vto = layBottomBar.getViewTreeObserver();
         vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             public boolean onPreDraw() {
                 imageLoader.displayImage(currentItem.imageUrl, imgInsta, options, imageListener);
@@ -111,7 +111,7 @@ public abstract class FragmentWebView extends Fragment {
             @Override
             public void onClick(View v) {
                 vistaWeb.goBack();
-                checkNavigationButton();
+               // checkNavigationButton();
             }
         });
 
@@ -119,7 +119,7 @@ public abstract class FragmentWebView extends Fragment {
             @Override
             public void onClick(View v) {
                 vistaWeb.goForward();
-                checkNavigationButton();
+                //checkNavigationButton();
             }
         });
 
@@ -149,7 +149,7 @@ public abstract class FragmentWebView extends Fragment {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 progressBarLoad.setVisibility(View.INVISIBLE);
-                checkNavigationButton();
+                //checkNavigationButton();
             }
         });
 
@@ -167,19 +167,19 @@ public abstract class FragmentWebView extends Fragment {
         return rootView;
     }
 
-    private void checkNavigationButton() {
-        if (vistaWeb.canGoBack()) {
-            btnBack.setVisibility(View.VISIBLE);
-        } else {
-            btnBack.setVisibility(View.INVISIBLE);
-        }
-
-        if (vistaWeb.canGoForward()) {
-            btnForward.setVisibility(View.VISIBLE);
-        } else {
-            btnForward.setVisibility(View.INVISIBLE);
-        }
-    }
+//    private void checkNavigationButton() {
+//        if (vistaWeb.canGoBack()) {
+//            btnBack.setVisibility(View.VISIBLE);
+//        } else {
+//            btnBack.setVisibility(View.INVISIBLE);
+//        }
+//
+//        if (vistaWeb.canGoForward()) {
+//            btnForward.setVisibility(View.VISIBLE);
+//        } else {
+//            btnForward.setVisibility(View.INVISIBLE);
+//        }
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -209,7 +209,7 @@ public abstract class FragmentWebView extends Fragment {
     public void backButtonWasPressed() {
         vistaWeb.setDrawingCacheEnabled(false);
         vistaWeb.setVisibility(View.VISIBLE);
-        checkNavigationButton();
+        //checkNavigationButton();
         isInWebViewState = true;
 
     }
