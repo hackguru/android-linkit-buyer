@@ -18,6 +18,8 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -116,6 +118,12 @@ public class FragmentLogin extends Fragment {
             }
         };
         webView.setWebViewClient(wvc);
+
+        // Get tracker.
+        Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
+        t.setScreenName("LinkitShopper - Login");
+        t.send(new HitBuilders.AppViewBuilder().build());
+
         return rootView;
     }
 

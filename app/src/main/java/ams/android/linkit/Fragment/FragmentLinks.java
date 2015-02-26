@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -138,13 +140,16 @@ public class FragmentLinks extends Fragment {
         });
         listView.setAdapter(adapterListview);
 
-        //refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
+        // Get tracker.
+        Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
+        t.setScreenName("LinkitShopper - List");
+        t.send(new HitBuilders.AppViewBuilder().build());
+
         return rootView;
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         swipeLayout.setRefreshing(true);
         refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
