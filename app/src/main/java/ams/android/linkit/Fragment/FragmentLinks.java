@@ -3,9 +3,12 @@ package ams.android.linkit.Fragment;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,6 +35,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 import ams.android.linkit.Adapter.AdapterListview;
 import ams.android.linkit.Adapter.AdapterListviewEmpty;
@@ -370,12 +374,35 @@ public class FragmentLinks extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/" + itemsEmpty.get(position).owner));
-                        startActivity(browserIntent);
+
+                        Uri uri = Uri.parse("http://instagram.com/_u/" + itemsEmpty.get(position).owner);
+                        Intent insta = new Intent(Intent.ACTION_VIEW, uri);
+                        insta.setPackage("com.instagram.android");
+
+                        if (isIntentAvailable(getActivity().getApplicationContext(), insta)){
+                            startActivity(insta);
+                        } else{
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsEmpty.get(position).owner )));
+                        }
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(_URL));
+
+
+                        
+
+//                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/" + ));
+//                        startActivity(browserIntent);
                     }
                 });
+
                 adapterListviewEmpty.notifyDataSetChanged();
                 //showToast("Data Updated");
+            }
+
+            private boolean isIntentAvailable(Context ctx, Intent intent) {
+                final PackageManager packageManager = ctx.getPackageManager();
+                List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                return list.size() > 0;
             }
 
             @Override

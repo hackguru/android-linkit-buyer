@@ -9,15 +9,18 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp">
+        android:id="@+id/lay_emptyInfo"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp">
 
         <TextView
             android:id="@+id/txtOwner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/imgProfile"
-            android:layout_toEndOf="@+id/imgProfile"
-            android:layout_toRightOf="@+id/imgProfile"
+            android:layout_alignTop="@+id/lay_imgProfile"
+            android:layout_toRightOf="@+id/lay_imgProfile"
             android:background="#00ffffff"
             android:clickable="false"
             android:editable="false"
@@ -28,35 +31,63 @@
             android:singleLine="true"
             android:textColor="#2f5f87"
             android:textSize="12dp"
-            android:textStyle="bold|italic" />
+            android:textStyle="bold|italic"
+            android:text="nastygal"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp" />
 
         <TextView
             android:id="@+id/txtDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imgProfile"
-            android:layout_toRightOf="@+id/imgProfile"
+            android:layout_alignBottom="@+id/lay_imgProfile"
+            android:layout_toRightOf="@+id/lay_imgProfile"
             android:background="#00ffffff"
             android:clickable="false"
             android:editable="false"
             android:imeOptions="actionDone"
-            android:maxLength="40"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:singleLine="false"
             android:textColor="#4a4a4a"
-            android:textSize="14sp"
+            android:textSize="12dp"
             android:textStyle="italic"
             android:lines="3"
-            android:gravity="center_vertical|left" />
+            android:gravity="center_vertical|left"
+            android:text="NastyGal.com \nEnter the nasty Galaxy \nOnline, mdf sdf sd sdf sfs"
+            android:layout_below="@+id/txtOwner" />
 
-        <ImageView
-            android:id="@+id/imgProfile"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/lay_imgProfile"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true" />
+            android:layout_alignParentTop="true"
+            android:padding="1dp"
+            android:background="#cccccc">
+
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lay_div"
+        android:layout_below="@+id/lay_emptyInfo"
+        android:paddingTop="5dp">
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#c1c1c1"></FrameLayout>
     </RelativeLayout>
 
 </RelativeLayout>
