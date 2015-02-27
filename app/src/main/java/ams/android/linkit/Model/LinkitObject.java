@@ -9,6 +9,7 @@ public class LinkitObject {
     public String productDescription;
     public String owner;
     public String ownerProfilePic;
+    public String ownerWebsite;
     public String productLink;
     public String linkSrceenShot;
     public String imageUrl;

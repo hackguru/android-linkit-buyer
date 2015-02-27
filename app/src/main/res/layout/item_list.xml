@@ -52,7 +52,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/lay_center">
+            android:layout_toRightOf="@+id/lay_center"
+            android:layout_alignTop="@+id/lay_insta"
+            android:layout_alignBottom="@+id/lay_insta">
 
             <ImageView
                 android:id="@+id/img_link"
@@ -61,8 +63,7 @@
                 android:layout_gravity="center_vertical"
                 android:adjustViewBounds="true"
                 android:padding="0dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/linkit" />
+                android:scaleType="fitCenter" />
 
         </RelativeLayout>
 
@@ -84,49 +85,41 @@
         android:layout_below="@+id/layout_item_images"
         android:padding="5dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_toRightOf="@+id/layImgProfile">
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/layImgProfile"
+            android:layout_alignTop="@+id/layImgProfile"
+            android:layout_alignBottom="@+id/layImgProfile">
 
             <TextView
                 android:id="@+id/txtOwner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#00ffffff"
-                android:imeOptions="actionDone"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:singleLine="true"
                 android:textColor="#244e71"
-                android:textSize="12dp"
-                android:textStyle="bold"
-                android:layout_toRightOf="@+id/layImgProfile"
-                android:layout_below="@+id/layImgProfile"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:layout_margin="0dp"
-                android:layout_alignBaseline="@+id/layImgProfile" />
+                android:textSize="14sp"
+                android:gravity="left|top"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentTop="true" />
 
             <TextView
                 android:id="@+id/txtDesc"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
+                android:layout_height="fill_parent"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:textColor="#4d9ad8"
+                android:textColor="#575757"
+                android:singleLine="false"
                 android:textSize="14sp"
-                android:background="#00ffffff"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="false"
-                android:layout_toRightOf="@+id/layImgProfile"
-                android:layout_toEndOf="@+id/layImgProfile"
-                android:gravity="center_vertical"
-                android:layout_below="@+id/layImgProfile" />
-        </LinearLayout>
+                android:gravity="bottom|left"
+                android:autoText="false"
+                android:layout_below="@+id/txtOwner"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"

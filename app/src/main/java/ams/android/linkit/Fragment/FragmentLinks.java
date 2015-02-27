@@ -64,6 +64,8 @@ public class FragmentLinks extends Fragment {
     RelativeLayout layWaiting;
     Boolean callState = false;
     TextView txtEmptyInfo;
+    String globalEndDate = null;
+    String globalStartDate = null;
 
     public static final FragmentLinks newInstance(LinkitObject item) {
         FragmentLinks f = new FragmentLinks();
@@ -113,7 +115,8 @@ public class FragmentLinks extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
+                //addDataToStart();
+                refreshData();
             }
         });
         swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
@@ -137,12 +140,11 @@ public class FragmentLinks extends Fragment {
                         Log.i("linkit", "end list");
                         layWaiting.setVisibility(View.VISIBLE);
                         callState = true;
-                        addData(null, items.get(items.size() - 1).createdDate, getResources().getString(R.string.PAGING_COUNT));
+                        addDataToEnd();
                     }
                 }
             }
         });
-        listView.setAdapter(adapterListview);
 
         // Get tracker.
         Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
@@ -156,8 +158,7 @@ public class FragmentLinks extends Fragment {
     public void onResume() {
         super.onResume();
         swipeLayout.setRefreshing(true);
-        refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
-        //Toast.makeText(getActivity().getApplicationContext(),"resume",Toast.LENGTH_SHORT).show();
+        refreshData();
     }
 
     public void serverLogout() {
@@ -181,6 +182,8 @@ public class FragmentLinks extends Fragment {
                 } catch (Exception e) {
                 }
                 //showToast("Logout");
+                items.clear();
+                itemsEmpty.clear();
                 FragmentLogin f1 = new FragmentLogin();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
@@ -213,26 +216,15 @@ public class FragmentLinks extends Fragment {
         });
     }
 
-    public void addData(String startDate, String endDate, String count) {
+    public void addDataToEnd() {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
-
         client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
-
-        if (startDate != null) {
-            requestParams.add("startDate", startDate);
+        if (globalStartDate != null) {
+            requestParams.add("endDate", globalStartDate);
         }
-
-        if (endDate != null) {
-            requestParams.add("endDate", endDate);
-        }
-
-        if (count != null) {
-            requestParams.add("count", count);
-        }
-
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
@@ -246,6 +238,8 @@ public class FragmentLinks extends Fragment {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
+
+                globalStartDate = items.get(items.size() - 1).createdDate;
                 adapterListview.notifyDataSetChanged();
                 layWaiting.setVisibility(View.INVISIBLE);
                 callState = false;
@@ -254,6 +248,7 @@ public class FragmentLinks extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 callState = false;
+                swipeLayout.setRefreshing(false);
             }
 
             @Override
@@ -262,30 +257,20 @@ public class FragmentLinks extends Fragment {
         });
     }
 
-    public void refreshData(String startDate, String endDate, String count) {
+    public void refreshData() {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
-
         client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
-        if (startDate != null) {
-            requestParams.add("startDate", startDate);
+        if (globalStartDate != null) {
+            requestParams.add("startDate", globalStartDate);
         }
-
-        if (endDate != null) {
-            requestParams.add("endDate", endDate);
-        }
-
-        if (count != null) {
-            requestParams.add("count", count);
-        }
+//        if (globalEndDate != null) {
+//            requestParams.add("endDate", globalEndDate);
+//        }
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
-            @Override
-            public void onStart() {
-            }
-
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 items.clear();
@@ -294,15 +279,16 @@ public class FragmentLinks extends Fragment {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
                 if (items.isEmpty()) {
                     txtEmptyInfo.setVisibility(View.VISIBLE);
-                    refreshDataEmpty(null, null, getResources().getString(R.string.PAGING_COUNT));
+                    refreshDataEmpty();
 
                 } else {
+                    txtEmptyInfo.setVisibility(View.GONE);
+                    //globalEndDate = items.get(0).createdDate;
+                    globalStartDate = items.get(items.size() - 1).createdDate;
                     listView.setAdapter(adapterListview);
                     adapterListview.notifyDataSetChanged();
-                    txtEmptyInfo.setVisibility(View.GONE);
                     swipeLayout.setRefreshing(false);
                     if (currentItem != null) {
                         FragmentWebView f1 = FragmentWebView.newInstance(items.get(0));
@@ -320,33 +306,17 @@ public class FragmentLinks extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                //Log.e("linkit", "ERR : " + errorResponse.toString());
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
+                swipeLayout.setRefreshing(false);
             }
         });
     }
 
-    public void refreshDataEmpty(String startDate, String endDate, String count) {
+    public void refreshDataEmpty() {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
-
         client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
-        if (startDate != null) {
-            requestParams.add("startDate", startDate);
-        }
-
-        if (endDate != null) {
-            requestParams.add("endDate", endDate);
-        }
-
-        if (count != null) {
-            requestParams.add("count", count);
-        }
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/recommendedMerchants";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
@@ -361,42 +331,23 @@ public class FragmentLinks extends Fragment {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
-//                swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//                    @Override
-//                    public void onRefresh() {
-//                        refreshData(null, null, getResources().getString(R.string.PAGING_COUNT));
-//                    }
-//                });
                 swipeLayout.setRefreshing(false);
                 adapterListviewEmpty = new AdapterListviewEmpty(getActivity(), getFragmentManager(), itemsEmpty);
                 listView.setAdapter(adapterListviewEmpty);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                         Uri uri = Uri.parse("http://instagram.com/_u/" + itemsEmpty.get(position).owner);
                         Intent insta = new Intent(Intent.ACTION_VIEW, uri);
                         insta.setPackage("com.instagram.android");
-
-                        if (isIntentAvailable(getActivity().getApplicationContext(), insta)){
+                        if (isIntentAvailable(getActivity().getApplicationContext(), insta)) {
                             startActivity(insta);
-                        } else{
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsEmpty.get(position).owner )));
+                        } else {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsEmpty.get(position).owner)));
                         }
-
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(_URL));
-
-
-                        
-
-//                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/" + ));
-//                        startActivity(browserIntent);
                     }
                 });
-
                 adapterListviewEmpty.notifyDataSetChanged();
-                //showToast("Data Updated");
             }
 
             private boolean isIntentAvailable(Context ctx, Intent intent) {
@@ -408,6 +359,7 @@ public class FragmentLinks extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 //Log.e("linkit", "ERR : " + errorResponse.toString());
+                swipeLayout.setRefreshing(false);
             }
 
             @Override
@@ -421,7 +373,11 @@ public class FragmentLinks extends Fragment {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 JSONArray feeds = jsonObj.getJSONArray("results");
-                for (int i = 0; i < feeds.length(); i++) {
+                int counterStart, counterEnd, counterSeed;
+                counterStart = 0;
+                counterEnd = feeds.length();
+                counterSeed = 1;
+                for (int i = counterStart; i < counterEnd; i = i + counterSeed) {
                     JSONObject item = feeds.getJSONObject(i);
                     LinkitObject myobject = new LinkitObject();
 
@@ -430,8 +386,6 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.mediaID = "";
                     }
-
-
                     if (item.getJSONObject("media").getJSONObject("owner").has("username")) {
                         myobject.owner = item.getJSONObject("media").getJSONObject("owner").getString("username");
                     } else {
@@ -442,8 +396,6 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.ownerProfilePic = "";
                     }
-
-                    // date
                     if (item.getJSONObject("media").has("created")) {
                         myobject.createdDate = item.getJSONObject("media").getString("created");
                     } else {
@@ -464,12 +416,14 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.linkSrceenShot = "";
                     }
-                    if (item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").has("url")) {
+                    try {
                         myobject.imageUrl = item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").getString("url");
-                    } else {
+                    } catch (Exception ex) {
                         myobject.imageUrl = "";
                     }
-                    items.add(myobject);
+                    if (!myobject.imageUrl.isEmpty()) {
+                        items.add(myobject);
+                    }
                 }
 
             } catch (JSONException e) {
@@ -494,7 +448,6 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.mediaID = "";
                     }
-
                     if (item.has("username")) {
                         myobject.owner = item.getString("username");
                     } else {
@@ -505,12 +458,17 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.ownerProfilePic = "";
                     }
-
                     if (item.has("bio")) {
                         myobject.productDescription = item.getString("bio");
                     } else {
                         myobject.productDescription = "";
                     }
+                    if (item.has("website")) {
+                        myobject.ownerWebsite = item.getString("website");
+                    } else {
+                        myobject.ownerWebsite = "";
+                    }
+                    //
 
                     itemsEmpty.add(myobject);
                 }

@@ -22,19 +22,15 @@
             android:layout_alignTop="@+id/lay_imgProfile"
             android:layout_toRightOf="@+id/lay_imgProfile"
             android:background="#00ffffff"
-            android:clickable="false"
             android:editable="false"
-            android:imeOptions="actionDone"
-            android:maxLength="40"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:singleLine="true"
             android:textColor="#2f5f87"
-            android:textSize="12dp"
+            android:textSize="11dp"
             android:textStyle="bold|italic"
-            android:text="nastygal"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp" />
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp" />
 
         <TextView
             android:id="@+id/txtDesc"
@@ -43,19 +39,14 @@
             android:layout_alignBottom="@+id/lay_imgProfile"
             android:layout_toRightOf="@+id/lay_imgProfile"
             android:background="#00ffffff"
-            android:clickable="false"
-            android:editable="false"
-            android:imeOptions="actionDone"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:singleLine="false"
             android:textColor="#4a4a4a"
             android:textSize="12dp"
-            android:textStyle="italic"
-            android:lines="3"
-            android:gravity="center_vertical|left"
-            android:text="NastyGal.com \nEnter the nasty Galaxy \nOnline, mdf sdf sd sdf sfs"
-            android:layout_below="@+id/txtOwner" />
+            android:textStyle="bold|italic"
+            android:gravity="left|top"
+            android:layout_below="@+id/txtOwner"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -68,8 +59,8 @@
 
             <ImageView
                 android:id="@+id/imgProfile"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true" />

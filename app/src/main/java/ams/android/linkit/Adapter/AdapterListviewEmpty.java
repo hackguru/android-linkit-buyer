@@ -74,11 +74,12 @@ public class AdapterListviewEmpty extends BaseAdapter {
         if (rootView == null) rootView = inflater.inflate(R.layout.item_list_empty, null);
 
         ImageView imgProfile = (ImageView) rootView.findViewById(R.id.imgProfile);
-        TextView txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
         TextView txtOwner = (TextView) rootView.findViewById(R.id.txtOwner);
+        TextView txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
+
 
         if (!items.get(position).productDescription.equals("null")) {
-            txtDesc.setText(items.get(position).productDescription);
+            txtDesc.setText(items.get(position).productDescription + " \n" + items.get(position).ownerWebsite);
         } else {
             txtDesc.setText("");
         }
