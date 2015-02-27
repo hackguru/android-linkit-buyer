@@ -146,6 +146,9 @@ public class FragmentLinks extends Fragment {
             }
         });
 
+        swipeLayout.setRefreshing(true);
+        refreshData();
+
         // Get tracker.
         Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
         t.setScreenName("LinkitShopper - List");
@@ -155,10 +158,15 @@ public class FragmentLinks extends Fragment {
     }
 
     @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        swipeLayout.setRefreshing(true);
-        refreshData();
+//        swipeLayout.setRefreshing(true);
+//        refreshData();
     }
 
     public void serverLogout() {
