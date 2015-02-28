@@ -274,9 +274,7 @@ public class FragmentLinks extends Fragment {
         if (globalStartDate != null) {
             requestParams.add("startDate", globalStartDate);
         }
-//        if (globalEndDate != null) {
-//            requestParams.add("endDate", globalEndDate);
-//        }
+
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
@@ -424,14 +422,16 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.linkSrceenShot = "";
                     }
-                    try {
+                    if (item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").has("url")) {
                         myobject.imageUrl = item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").getString("url");
-                    } catch (Exception ex) {
+                    } else {
                         myobject.imageUrl = "";
                     }
-                    if (!myobject.imageUrl.isEmpty()) {
-                        items.add(myobject);
-                    }
+
+                    items.add(myobject);
+//                    if (!myobject.imageUrl.isEmpty()) {
+//                        items.add(myobject);
+//                    }
                 }
 
             } catch (JSONException e) {

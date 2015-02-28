@@ -127,7 +127,6 @@ public class NotiHeadService extends Service {
             //handle the Exception
         }
 
-
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         if (rootView == null) rootView = inflater.inflate(R.layout.noti_head, null);
@@ -139,7 +138,6 @@ public class NotiHeadService extends Service {
                 PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.TOP;
 
-
         layoutInfo = (RelativeLayout) rootView.findViewById(R.id.lay_noti_text);
         RelativeLayout layClick = (RelativeLayout) rootView.findViewById(R.id.lay_noti_main);
         img = (ImageView) rootView.findViewById(R.id.img_noti);
@@ -148,15 +146,13 @@ public class NotiHeadService extends Service {
         layClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getApplicationContext(), "click!", Toast.LENGTH_SHORT).show();
                 Intent myIntent = new Intent().setClass(NotiHeadService.this, MainActivity.class);
                 myIntent.putExtra("RunByNoti", true);
                 myIntent.putExtra("imageUrl", imageUrl);
                 myIntent.putExtra("linkSrceenShot", linkSrceenShot);
                 myIntent.putExtra("productLink", productLink);
                 myIntent.putExtra("text", text);
-                //myIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(myIntent);
 
                 new mainTask().run();
