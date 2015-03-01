@@ -12,6 +12,7 @@ import android.view.ViewTreeObserver;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -43,6 +44,7 @@ import ams.android.linkit.Tools.GlobalApplication;
 public abstract class FragmentWebView extends Fragment {
     private static String defaultURL = "http://www.google.com/?gws_rd=ssl";
     protected BackHandlerInterface backHandlerInterface;
+    RelativeLayout mainView;
     WebView vistaWeb;
     ImageButton btnBack, btnForward, btnLinkout;
     LinkitObject currentItem;
@@ -70,12 +72,14 @@ public abstract class FragmentWebView extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_webview, container, false);
+        mainView = (RelativeLayout)rootView.findViewById(R.id.lay_MainView);
         vistaWeb = (WebView) rootView.findViewById(R.id.webView_Content);
         final ProgressBar progressBarLoad = (ProgressBar) rootView.findViewById(R.id.progressBar_load);
         RelativeLayout layBottomBar = (RelativeLayout) rootView.findViewById(R.id.lay_bottomBar);
         btnBack = (ImageButton) rootView.findViewById(R.id.btn_back);
         btnForward = (ImageButton) rootView.findViewById(R.id.btn_forward);
         btnLinkout = (ImageButton) rootView.findViewById(R.id.btn_linkout);
+        Button btnDone = (Button) rootView.findViewById(R.id.btn_done);
         final ImageView imgInsta = (ImageView) rootView.findViewById(R.id.img_insta_preview);
 
         options = new DisplayImageOptions.Builder()
@@ -114,7 +118,7 @@ public abstract class FragmentWebView extends Fragment {
             @Override
             public void onClick(View v) {
                 vistaWeb.goBack();
-               // checkNavigationButton();
+                // checkNavigationButton();
             }
         });
 
@@ -131,6 +135,14 @@ public abstract class FragmentWebView extends Fragment {
             public void onClick(View v) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentItem.productLink));
                 startActivity(browserIntent);
+            }
+        });
+
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment currentFragment = getFragmentManager().findFragmentByTag("WebView");
+                getActivity().getFragmentManager().beginTransaction().remove(currentFragment).commit();
             }
         });
 
@@ -210,6 +222,17 @@ public abstract class FragmentWebView extends Fragment {
     public void onStop() {
         super.onStop();
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mainView.removeView(vistaWeb);
+        vistaWeb.setFocusable(true);
+        vistaWeb.removeAllViews();
+        //vistaWeb.clearHistory();
+        vistaWeb.destroy();
+    }
+
 
     public void goBack() {
         vistaWeb.goBack();

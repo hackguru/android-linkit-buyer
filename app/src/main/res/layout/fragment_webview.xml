@@ -5,6 +5,7 @@
     android:background="#cccccc"
     android:orientation="vertical"
     android:touchscreenBlocksFocus="true"
+    android:id="@+id/lay_MainView"
     android:clickable="true">
 
     <WebView
@@ -37,68 +38,85 @@
         android:layout_alignParentBottom="true"
         android:background="#f6f6f6"
         android:clickable="true"
-        android:gravity="clip_vertical"
-        android:paddingBottom="2dp"
-        android:paddingLeft="2dp"
-        android:paddingRight="20dp"
-        android:paddingTop="2dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:padding="2dp">
 
         <ImageView
             android:id="@+id/img_insta_preview"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:adjustViewBounds="false"
-            android:baselineAlignBottom="false"
-            android:cropToPadding="false"
-            android:padding="0dp"
-            android:scaleType="fitCenter"
-            android:layout_alignBottom="@+id/btn_linkout"
-            android:layout_alignTop="@+id/btn_linkout" />
+            android:layout_alignParentStart="false"
+            android:scaleType="fitStart"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true" />
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentTop="false"
+            android:layout_toRightOf="@+id/img_insta_preview"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="false"
+            android:layout_alignTop="@+id/img_insta_preview"
+            android:layout_alignBottom="@+id/img_insta_preview"
+            android:gravity="center_vertical">
 
             <ImageButton
                 android:id="@+id/btn_back"
-                android:layout_width="32dp"
+                android:layout_width="0dp"
                 android:layout_height="32dp"
-                android:layout_centerVertical="true"
                 android:background="#00ffffff"
                 android:scaleType="fitCenter"
                 android:src="@drawable/left"
-                android:text="&lt;"
-                android:visibility="visible"
-                android:layout_marginRight="50dp" />
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:layout_weight="20"
+                android:layout_margin="0dp" />
 
             <ImageButton
                 android:id="@+id/btn_forward"
-                android:layout_width="32dp"
+                android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_centerVertical="true"
                 android:background="#00ffffff"
                 android:scaleType="fitCenter"
                 android:src="@drawable/right"
-                android:text=">"
-                android:visibility="visible" />
-        </LinearLayout>
+                android:layout_weight="20"
+                android:layout_margin="0dp" />
 
-        <ImageButton
-            android:id="@+id/btn_linkout"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginLeft="60dp"
-            android:background="#00ffffff"
-            android:scaleType="fitCenter"
-            android:src="@drawable/linkout"
-            android:text=">"
-            android:visibility="visible"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
+            <ImageButton
+                android:id="@+id/btn_linkout"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:background="#00ffffff"
+                android:scaleType="fitCenter"
+                android:src="@drawable/linkout"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_weight="20"
+                android:layout_margin="0dp" />
+
+            <Button
+                android:id="@+id/btn_done"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:background="#00ffffff"
+                android:textColor="#2191c1"
+                android:scaleType="fitCenter"
+                android:src="@drawable/linkout"
+                android:text="Done"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_weight="20"
+                android:layout_margin="0dp"
+                android:textSize="18sp"
+                android:typeface="normal" />
+        </LinearLayout>
 
     </RelativeLayout>
 

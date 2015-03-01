@@ -41,8 +41,22 @@
         android:layout_height="42dp"
         android:background="#F9FFFFFF">
 
+        <ImageButton
+            android:id="@+id/btn_instagram"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="false"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:background="#0000"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/instagram"
+            android:layout_alignParentLeft="true" />
+
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/img_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -59,7 +73,7 @@
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
             android:background="#0000"
-            android:padding="5dp"
+            android:padding="10dp"
             android:scaleType="fitCenter"
             android:src="@drawable/logout" />
 

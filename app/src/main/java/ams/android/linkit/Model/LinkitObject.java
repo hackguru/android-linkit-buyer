@@ -10,6 +10,7 @@ public class LinkitObject {
     public String owner;
     public String ownerProfilePic;
     public String ownerWebsite;
+    public String caption;
     public String productLink;
     public String linkSrceenShot;
     public String imageUrl;

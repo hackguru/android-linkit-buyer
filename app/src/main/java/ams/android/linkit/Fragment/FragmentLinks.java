@@ -55,15 +55,13 @@ public class FragmentLinks extends Fragment {
     ArrayList<LinkitObject> itemsEmpty = new ArrayList<LinkitObject>();
     AdapterListview adapterListview;
     AdapterListviewEmpty adapterListviewEmpty;
-    myListView listView;
-    String userID, regID;
-    LayoutInflater ginflater;
-    View grootView;
     SwipeRefreshLayout swipeLayout;
-    LinkitObject currentItem;
     RelativeLayout layWaiting;
-    Boolean callState = false;
+    myListView listView;
     TextView txtEmptyInfo;
+    LinkitObject currentItem;
+    Boolean callState = false;
+    String userID, regID;
     String globalEndDate = null;
     String globalStartDate = null;
 
@@ -81,14 +79,13 @@ public class FragmentLinks extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_links, container, false);
         userID = ((GlobalApplication) getActivity().getApplication()).getUserId();
         regID = ((GlobalApplication) getActivity().getApplication()).getRegistrationId();
-        ginflater = inflater;
-        grootView = rootView;
         listView = (myListView) rootView.findViewById(R.id.listView);
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         ImageButton btnLogout = (ImageButton) rootView.findViewById(R.id.btn_logout);
+        ImageButton btnInsta = (ImageButton) rootView.findViewById(R.id.btn_instagram);
+
         layWaiting = (RelativeLayout) rootView.findViewById(R.id.lay_waiting);
         txtEmptyInfo = (TextView) rootView.findViewById(R.id.txtEmptyInfo);
-
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +109,19 @@ public class FragmentLinks extends Fragment {
             }
         });
 
+        btnInsta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                try {
+                    Intent insta_intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.instagram.android");
+                    startActivity(insta_intent);
+                } catch (Exception e) {
+                    Log.e("linkitBuyer", "can't open Instagram");
+                }
+            }
+        });
+
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -123,9 +133,7 @@ public class FragmentLinks extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
         adapterListview = new AdapterListview(getActivity(), getFragmentManager(), items);
-
         listView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
         listView.setOnDetectScrollListener(new myListView.OnDetectScrollListener() {
             @Override
@@ -145,7 +153,6 @@ public class FragmentLinks extends Fragment {
                 }
             }
         });
-
         swipeLayout.setRefreshing(true);
         refreshData();
 
@@ -153,13 +160,7 @@ public class FragmentLinks extends Fragment {
         Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
         t.setScreenName("LinkitShopper - List");
         t.send(new HitBuilders.AppViewBuilder().build());
-
         return rootView;
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
@@ -215,7 +216,6 @@ public class FragmentLinks extends Fragment {
                 } else {
                     Log.e("linkit", "ERR");
                 }
-
             }
 
             @Override
@@ -246,7 +246,6 @@ public class FragmentLinks extends Fragment {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
                 globalStartDate = items.get(items.size() - 1).createdDate;
                 adapterListview.notifyDataSetChanged();
                 layWaiting.setVisibility(View.INVISIBLE);
@@ -356,12 +355,6 @@ public class FragmentLinks extends Fragment {
                 adapterListviewEmpty.notifyDataSetChanged();
             }
 
-            private boolean isIntentAvailable(Context ctx, Intent intent) {
-                final PackageManager packageManager = ctx.getPackageManager();
-                List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-                return list.size() > 0;
-            }
-
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 //Log.e("linkit", "ERR : " + errorResponse.toString());
@@ -406,6 +399,11 @@ public class FragmentLinks extends Fragment {
                         myobject.createdDate = item.getJSONObject("media").getString("created");
                     } else {
                         myobject.createdDate = "";
+                    }
+                    if (item.getJSONObject("media").has("caption")) {
+                        myobject.caption = item.getJSONObject("media").getString("caption");
+                    } else {
+                        myobject.caption = "";
                     }
                     if (item.getJSONObject("media").has("productDescription")) {
                         myobject.productDescription = item.getJSONObject("media").getString("productDescription");
@@ -487,6 +485,12 @@ public class FragmentLinks extends Fragment {
         } else {
             //Log.e(TAG, "Couldn't get any data from the url");
         }
+    }
+
+    private boolean isIntentAvailable(Context ctx, Intent intent) {
+        final PackageManager packageManager = ctx.getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
     }
 
 //    private void showToast(String text) {

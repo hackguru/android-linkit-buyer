@@ -48,13 +48,13 @@ import ams.android.linkit.Tools.GlobalApplication;
  */
 public class AdapterListview extends BaseAdapter {
 
-    Activity activity;
-    Context context;
-    FragmentManager fragmentManager;
-    ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
+    static Activity activity;
+    static Context context;
+    static FragmentManager fragmentManager;
+    static ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
     static ImageLoader imageLoader = ImageLoader.getInstance();
-    DisplayImageOptions options;
-    ImageLoadingListener imageListener;
+    static DisplayImageOptions options;
+    static ImageLoadingListener imageListener;
 
     public AdapterListview(Activity activity, FragmentManager fragmentManager, ArrayList<LinkitObject> items) {
         this.activity = activity;
@@ -93,7 +93,7 @@ public class AdapterListview extends BaseAdapter {
         ImageView imgLink = (ImageView) rootView.findViewById(R.id.img_link);
         ImageView imgInsta = (ImageView) rootView.findViewById(R.id.img_insta);
         ImageView imgProfile = (ImageView) rootView.findViewById(R.id.imgProfile);
-        TextView txtCaption = (TextView) rootView.findViewById(R.id.txtDesc);
+        TextView txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
         TextView txtOwner = (TextView) rootView.findViewById(R.id.txtOwner);
 
 //        final LayoutInflater finalInflater = inflater;
@@ -105,10 +105,10 @@ public class AdapterListview extends BaseAdapter {
 //            }
 //        });
 
-        if (!items.get(position).productDescription.equals("null")) {
-            txtCaption.setText(items.get(position).productDescription);
+        if (!items.get(position).caption.equals("null")) {
+            txtDesc.setText(items.get(position).caption);
         } else {
-            txtCaption.setText("");
+            txtDesc.setText("");
         }
 
         if (!items.get(position).owner.equals("null")) {

@@ -100,11 +100,11 @@
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:singleLine="true"
-                android:textColor="#244e71"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:gravity="left|top"
                 android:layout_alignParentLeft="false"
-                android:layout_alignParentTop="true" />
+                android:layout_alignParentTop="true"
+                android:textColor="#575757" />
 
             <TextView
                 android:id="@+id/txtDesc"
@@ -112,13 +112,14 @@
                 android:layout_height="fill_parent"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:textColor="#575757"
                 android:singleLine="false"
-                android:textSize="14sp"
-                android:gravity="bottom|left"
+                android:textSize="12sp"
+                android:gravity="left|top"
                 android:autoText="false"
                 android:layout_below="@+id/txtOwner"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="#244e71"
+                android:maxLines="2" />
         </RelativeLayout>
 
         <RelativeLayout
