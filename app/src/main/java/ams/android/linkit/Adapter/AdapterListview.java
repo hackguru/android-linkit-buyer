@@ -22,7 +22,6 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -32,7 +31,6 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -95,15 +93,6 @@ public class AdapterListview extends BaseAdapter {
         ImageView imgProfile = (ImageView) rootView.findViewById(R.id.imgProfile);
         TextView txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
         TextView txtOwner = (TextView) rootView.findViewById(R.id.txtOwner);
-
-//        final LayoutInflater finalInflater = inflater;
-//        txtCaption.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                CustomDialog cdd = new CustomDialog(activity);
-//                cdd.show();
-//            }
-//        });
 
         if (!items.get(position).caption.equals("null")) {
             txtDesc.setText(items.get(position).caption);
@@ -189,7 +178,7 @@ public class AdapterListview extends BaseAdapter {
         protected String doInBackground(String... data) {
             HttpClient client = new DefaultHttpClient();
             HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000); //Timeout Limit
-            HttpResponse response;
+            //HttpResponse response;
             JSONObject json = new JSONObject();
 
             try {
@@ -201,12 +190,12 @@ public class AdapterListview extends BaseAdapter {
                 StringEntity se = new StringEntity(json.toString());
                 se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
                 post.setEntity(se);
-                response = client.execute(post);
-                    /*Checking response */
-                InputStream in = null;
-                if (response != null) {
-                    in = response.getEntity().getContent(); //Get the data in the entity
-                }
+                client.execute(post);
+//                    /*Checking response */
+//                InputStream in = null;
+//                if (response != null) {
+//                    in = response.getEntity().getContent(); //Get the data in the entity
+//                }
                 return "OK";
 
             } catch (Exception e) {
@@ -218,8 +207,6 @@ public class AdapterListview extends BaseAdapter {
 
         @Override
         protected void onPostExecute(String result) {
-
-
         }
     }
 }
