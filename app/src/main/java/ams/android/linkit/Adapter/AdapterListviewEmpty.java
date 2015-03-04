@@ -1,6 +1,5 @@
 package ams.android.linkit.Adapter;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -32,8 +31,6 @@ import ams.android.linkit.R;
  * Created by Aidin on 2/23/2015.
  */
 public class AdapterListviewEmpty extends BaseAdapter {
-
-    Activity activity;
     Context context;
     FragmentManager fragmentManager;
     ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
@@ -41,23 +38,24 @@ public class AdapterListviewEmpty extends BaseAdapter {
     DisplayImageOptions options;
     ImageLoadingListener imageListener;
 
-    public AdapterListviewEmpty(Activity activity, FragmentManager fragmentManager, ArrayList<LinkitObject> items) {
-        this.activity = activity;
-        this.context = activity.getApplicationContext();
+    public AdapterListviewEmpty(Context context, FragmentManager fragmentManager, ArrayList<LinkitObject> items) {
+        this.context = context;
         this.fragmentManager = fragmentManager;
         this.items = items;
         options = new DisplayImageOptions.Builder()
                 .resetViewBeforeLoading(true)
                 .showImageOnFail(R.drawable.fail)
                 .showImageOnLoading(R.drawable.loading)
-                .showImageForEmptyUri(R.drawable.unlink).cacheInMemory(true)
+                .showImageForEmptyUri(R.drawable.unlink)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
                 .preProcessor(new BitmapProcessor() {
                     @Override
                     public Bitmap process(Bitmap bitmap) {
                         return Bitmap.createScaledBitmap(bitmap, 400, 400, true);
                     }
                 })
-                .cacheOnDisk(true).build();
+                .build();
 
         imageListener = new ImageDisplayListener();
         if (!imageLoader.isInited()) {
@@ -77,7 +75,6 @@ public class AdapterListviewEmpty extends BaseAdapter {
         TextView txtOwner = (TextView) rootView.findViewById(R.id.txtOwner);
         TextView txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
 
-
         if (!items.get(position).productDescription.equals("null")) {
             txtDesc.setText(items.get(position).productDescription + " \n" + items.get(position).ownerWebsite);
         } else {
@@ -91,19 +88,6 @@ public class AdapterListviewEmpty extends BaseAdapter {
         }
 
         imageLoader.displayImage(items.get(position).ownerProfilePic, imgProfile, options, imageListener);
-
-//        //if (!items.get(position).linkToProduct.equals("")) {
-//        imgLink.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                FragmentWebView f1 = FragmentWebView.newInstance(items.get(position));
-//                FragmentTransaction ft = fragmentManager.beginTransaction();
-//                ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
-//                ft.add(R.id.container, f1, "WebView");
-//                ft.addToBackStack("WebView");
-//                ft.commit();
-//            }
-//        });
         return rootView;
     }
 

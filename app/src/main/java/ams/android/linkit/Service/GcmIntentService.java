@@ -16,10 +16,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * Created by Aidin on 2/1/2015.
  */
 public class GcmIntentService extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
-    private static String TAG = "linkit";
-    NotificationCompat.Builder builder;
-    private NotificationManager mNotificationManager;
+    //    public static final int NOTIFICATION_ID = 1;
+    //    private NotificationManager mNotificationManager;
+    //    NotificationCompat.Builder builder;
+    private static String TAG = "linkitShopper";
 
     public GcmIntentService() {
         super("GcmIntentService");

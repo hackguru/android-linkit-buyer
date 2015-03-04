@@ -12,7 +12,7 @@
         android:layout_below="@+id/txtEmptyInfo">
 
 
-        <ams.android.linkit.Tools.myListView
+        <ams.android.linkit.Tools.customListView
 	    android:id="@+id/listView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

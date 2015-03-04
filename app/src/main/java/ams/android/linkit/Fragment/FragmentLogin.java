@@ -3,16 +3,14 @@ package ams.android.linkit.Fragment;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
@@ -33,6 +31,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import ams.android.linkit.Activity.MainActivity;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
 
@@ -42,18 +41,20 @@ import ams.android.linkit.Tools.GlobalApplication;
  */
 public class FragmentLogin extends Fragment {
 
-    private static String TAG = "linkit";
+    private static String TAG = "linkitShopper";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     GoogleCloudMessaging gcm;
-    Context context;
     WebView webView;
     ImageView imageReload;
     ProgressBar progressBarLoad;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
+//        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
+//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        }
+
+        ((MainActivity) getActivity()).currentFragmentName = "Login";
+
         View rootView = inflater.inflate(R.layout.fragment_login, container, false);
         webView = (WebView) rootView.findViewById(R.id.webViewLogin);
         imageReload = (ImageView) rootView.findViewById(R.id.imgRefresh);
@@ -80,13 +81,15 @@ public class FragmentLogin extends Fragment {
             }
         });
         imageReload.bringToFront();
-        CookieSyncManager.createInstance(getActivity());
         CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.removeAllCookie();
+        if (Build.VERSION.SDK_INT > 20) {
+            cookieManager.flush();
+        } else {
+            cookieManager.removeAllCookie();
+        }
 
-        context = getActivity().getApplicationContext();
         if (checkPlayServices()) {
-            gcm = GoogleCloudMessaging.getInstance(context);
+            gcm = GoogleCloudMessaging.getInstance(GlobalApplication.getAppContext());
             if (((GlobalApplication) getActivity().getApplication()).getRegistrationId().isEmpty()) {
                 registerInBackground();
             } else {
@@ -143,7 +146,7 @@ public class FragmentLogin extends Fragment {
             String msg;
             try {
                 if (gcm == null) {
-                    gcm = GoogleCloudMessaging.getInstance(context);
+                    gcm = GoogleCloudMessaging.getInstance(GlobalApplication.getAppContext());
                 }
                 String regId = gcm.register(getResources().getString(R.string.SENDER_ID));
                 msg = "Device registered, registration ID=" + regId;
@@ -162,7 +165,7 @@ public class FragmentLogin extends Fragment {
     }
 
     private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GlobalApplication.getAppContext());
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, getActivity(),
@@ -183,10 +186,6 @@ public class FragmentLogin extends Fragment {
         client.addHeader("userType", "buyer");
         client.get(URL, new AsyncHttpResponseHandler() {
             @Override
-            public void onStart() {
-            }
-
-            @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 try {
                     parseJSON(new String(response, "UTF-8"));
@@ -197,7 +196,6 @@ public class FragmentLogin extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.e(TAG, "ERR");
             }
 
             @Override
@@ -215,7 +213,6 @@ public class FragmentLogin extends Fragment {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                //ft.addToBackStack("Links");
                 ft.commit();
             } catch (JSONException e) {
                 e.printStackTrace();

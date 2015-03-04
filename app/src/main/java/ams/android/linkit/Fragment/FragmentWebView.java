@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -33,6 +34,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import ams.android.linkit.Activity.MainActivity;
 import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
@@ -41,59 +43,66 @@ import ams.android.linkit.Tools.GlobalApplication;
 /**
  * Created by Aidin on 2/3/2015.
  */
-public abstract class FragmentWebView extends Fragment {
+public class FragmentWebView extends Fragment {
+    private static String TAG = "linkitShopper";
     private static String defaultURL = "http://www.google.com/?gws_rd=ssl";
-    protected BackHandlerInterface backHandlerInterface;
     RelativeLayout mainView;
+    static ImageLoader imageLoader = ImageLoader.getInstance();
+    static DisplayImageOptions options;
+    static DisplayImageOptions optionsFull;
+    static ImageLoadingListener imageListener;
     WebView vistaWeb;
-    ImageButton btnBack, btnForward, btnLinkout;
+    ImageButton btnBack;
+    ImageButton btnForward;
+    ImageButton btnLinkout;
     LinkitObject currentItem;
-    Bitmap bm;
     String urlPhoto, urlJSON;
     Boolean isInWebViewState = true;
-    ImageLoader imageLoader = ImageLoader.getInstance();
-    DisplayImageOptions options;
-    ImageLoadingListener imageListener;
-
-    public static final FragmentWebView newInstance(LinkitObject item) {
-        FragmentWebView f = new FragmentWebView() {
-            @Override
-            public boolean onBackPressed() {
-                return false;
-            }
-        };
-        f.currentItem = item;
-        return f;
-    }
-
-    public abstract boolean onBackPressed();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
+//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        }
+        ((MainActivity) getActivity()).currentFragmentName = "WebView";
+        try {
+            currentItem = getArguments().getParcelable("item");
+        } catch (Exception ex) {
+        }
         final View rootView = inflater.inflate(R.layout.fragment_webview, container, false);
-        mainView = (RelativeLayout)rootView.findViewById(R.id.lay_MainView);
-        vistaWeb = (WebView) rootView.findViewById(R.id.webView_Content);
         final ProgressBar progressBarLoad = (ProgressBar) rootView.findViewById(R.id.progressBar_load);
+        final ImageView imgInsta = (ImageView) rootView.findViewById(R.id.img_insta_preview);
+        final ImageView imgInstaFull = (ImageView) rootView.findViewById(R.id.imgInstaPreviewFull);
         RelativeLayout layBottomBar = (RelativeLayout) rootView.findViewById(R.id.lay_bottomBar);
+        Button btnDone = (Button) rootView.findViewById(R.id.btnDone);
+        mainView = (RelativeLayout) rootView.findViewById(R.id.lay_MainView);
+        vistaWeb = (WebView) rootView.findViewById(R.id.webView_Content);
         btnBack = (ImageButton) rootView.findViewById(R.id.btn_back);
         btnForward = (ImageButton) rootView.findViewById(R.id.btn_forward);
         btnLinkout = (ImageButton) rootView.findViewById(R.id.btn_linkout);
-        Button btnDone = (Button) rootView.findViewById(R.id.btn_done);
-        final ImageView imgInsta = (ImageView) rootView.findViewById(R.id.img_insta_preview);
 
         options = new DisplayImageOptions.Builder()
                 .resetViewBeforeLoading(true)
                 .showImageOnFail(R.drawable.fail)
                 .showImageOnLoading(R.drawable.loading)
-                .showImageForEmptyUri(R.drawable.unlink).cacheInMemory(true)
+                .showImageForEmptyUri(R.drawable.unlink)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
                 .preProcessor(new BitmapProcessor() {
                     @Override
                     public Bitmap process(Bitmap bitmap) {
                         return Bitmap.createScaledBitmap(bitmap, 100, 100, true);
                     }
                 })
-                .cacheOnDisk(true).build();
+                .build();
+        optionsFull = new DisplayImageOptions.Builder()
+                .resetViewBeforeLoading(true)
+                .showImageOnFail(R.drawable.fail)
+                .showImageOnLoading(R.drawable.loading)
+                .showImageForEmptyUri(R.drawable.unlink)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .build();
 
         imageListener = new ImageDisplayListener();
         if (!imageLoader.isInited()) {
@@ -118,15 +127,12 @@ public abstract class FragmentWebView extends Fragment {
             @Override
             public void onClick(View v) {
                 vistaWeb.goBack();
-                // checkNavigationButton();
             }
         });
-
         btnForward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 vistaWeb.goForward();
-                //checkNavigationButton();
             }
         });
 
@@ -141,8 +147,7 @@ public abstract class FragmentWebView extends Fragment {
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment currentFragment = getFragmentManager().findFragmentByTag("WebView");
-                getActivity().getFragmentManager().beginTransaction().remove(currentFragment).commit();
+                getFragmentManager().popBackStack();
             }
         });
 
@@ -168,7 +173,6 @@ public abstract class FragmentWebView extends Fragment {
             }
         });
 
-        //vistaWeb.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 4.4.2; GT-I9500 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.109 Mobile Safari/537.36");
         vistaWeb.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         vistaWeb.getSettings().setAppCacheEnabled(true);
         vistaWeb.getSettings().setJavaScriptEnabled(true);
@@ -179,48 +183,30 @@ public abstract class FragmentWebView extends Fragment {
             vistaWeb.loadUrl(currentItem.productLink);
         }
 
+        imgInsta.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        imgInstaFull.setVisibility(View.VISIBLE);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_POINTER_UP:
+                        imgInstaFull.setVisibility(View.INVISIBLE);
+                        return true;
+                }
+                return false;
+            }
+        });
+        imageLoader.displayImage(currentItem.imageUrl, imgInstaFull, optionsFull, imageListener);
+
         // Get tracker.
         Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
         t.setScreenName("LinkitShopper - WebView");
         t.send(new HitBuilders.AppViewBuilder().build());
 
-
         return rootView;
-    }
-
-//    private void checkNavigationButton() {
-//        if (vistaWeb.canGoBack()) {
-//            btnBack.setVisibility(View.VISIBLE);
-//        } else {
-//            btnBack.setVisibility(View.INVISIBLE);
-//        }
-//
-//        if (vistaWeb.canGoForward()) {
-//            btnForward.setVisibility(View.VISIBLE);
-//        } else {
-//            btnForward.setVisibility(View.INVISIBLE);
-//        }
-//    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (!(getActivity() instanceof BackHandlerInterface)) {
-            throw new ClassCastException("Hosting activity must implement BackHandlerInterface");
-        } else {
-            backHandlerInterface = (BackHandlerInterface) getActivity();
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        backHandlerInterface.setSelectedFragment(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
     @Override
@@ -231,36 +217,6 @@ public abstract class FragmentWebView extends Fragment {
         vistaWeb.removeAllViews();
         //vistaWeb.clearHistory();
         vistaWeb.destroy();
-    }
-
-
-    public void goBack() {
-        vistaWeb.goBack();
-    }
-
-    public void backButtonWasPressed() {
-        vistaWeb.setDrawingCacheEnabled(false);
-        vistaWeb.setVisibility(View.VISIBLE);
-        //checkNavigationButton();
-        isInWebViewState = true;
-
-    }
-
-    public Boolean canGoBackHistory() {
-        return vistaWeb.canGoBack();
-    }
-
-    public Boolean isReadyForExit() {
-        if (isInWebViewState) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    public interface BackHandlerInterface {
-        public void setSelectedFragment(FragmentWebView backHandledFragment);
     }
 
     private class ImageDisplayListener extends SimpleImageLoadingListener {
@@ -292,6 +248,30 @@ public abstract class FragmentWebView extends Fragment {
         @Override
         public void onLoadingCancelled(String imageUri, View view) {
             super.onLoadingCancelled(imageUri, view);
+        }
+    }
+
+    public void goBack() {
+        vistaWeb.goBack();
+    }
+
+    public void backButtonWasPressed() {
+        vistaWeb.setDrawingCacheEnabled(false);
+        vistaWeb.setVisibility(View.VISIBLE);
+        btnBack.setVisibility(View.VISIBLE);
+        btnForward.setVisibility(View.VISIBLE);
+        isInWebViewState = true;
+    }
+
+    public Boolean canGoBackHistory() {
+        return vistaWeb.canGoBack();
+    }
+
+    public Boolean isReadyForExit() {
+        if (isInWebViewState) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

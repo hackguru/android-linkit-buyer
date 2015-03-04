@@ -17,22 +17,20 @@ import ams.android.linkit.R;
 /**
  * Created by Aidin on 2/5/2015.
  */
+
 public class GlobalApplication extends Application {
 
-    private static String TAG = "linkit";
+    private static String TAG = "linkitShopper";
     private static String PROPERTY_BADGET_COUNT = "badget_count";
     private static String PROPERTY_USER_ID = "user_id";
     private static String PROPERTY_REG_ID = "registration_id";
     private static String PROPERTY_APP_VERSION = "appVersion";
-
     public enum TrackerName {
         APP_TRACKER, // Tracker used only in this app.
         GLOBAL_TRACKER, // Tracker used by all the apps from a company. eg: roll-up tracking.
         ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
     }
-
-    HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
-
+    HashMap<TrackerName, Tracker> mTrackers = new HashMap<>();
     public synchronized Tracker getTracker(TrackerName trackerId) {
         if (!mTrackers.containsKey(trackerId)) {
 
@@ -45,8 +43,37 @@ public class GlobalApplication extends Application {
         }
         return mTrackers.get(trackerId);
     }
+    private static Context context;
 
-    public int getBadgeCount() {
+    public void onCreate ()
+    {
+        context=getApplicationContext();
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                handleUncaughtException (thread, e);
+            }
+        });
+    }
+
+    public static Context getAppContext(){
+        return context;
+    }
+
+
+    public void handleUncaughtException (Thread thread, Throwable e)
+    {
+        e.printStackTrace(); // not all Android versions will print the stack trace automatically
+//        Intent intent = new Intent ();
+//        intent.setAction ("ams.android.linkitmerchant.Tools"); // see step 5.
+//        intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK); // required when starting from Application
+//        startActivity (intent);
+        System.exit(1); // kill off the crashed app
+    }
+	
+	public int getBadgeCount() {
         final SharedPreferences prefs = getGCMPreferences();
         int badgetCountSaved = prefs.getInt(PROPERTY_BADGET_COUNT, 0);
         int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
@@ -72,6 +99,7 @@ public class GlobalApplication extends Application {
     }
 
     public String getUserId() {
+
         final SharedPreferences prefs = getGCMPreferences();
         String userIdSaved = prefs.getString(PROPERTY_USER_ID, "");
         if (userIdSaved.isEmpty()) {
@@ -88,6 +116,7 @@ public class GlobalApplication extends Application {
     }
 
     public void setUserId(String userId) {
+
         try {
             final SharedPreferences prefs = getGCMPreferences();
             int appVersion = getAppVersion();
@@ -96,12 +125,12 @@ public class GlobalApplication extends Application {
             editor.putString(PROPERTY_USER_ID, userId);
             editor.putInt(PROPERTY_APP_VERSION, appVersion);
             editor.commit();
-
         } catch (Exception e) {
         }
     }
 
     public String getRegistrationId() {
+
         final SharedPreferences prefs = getGCMPreferences();
         String registrationIdSaved = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationIdSaved.isEmpty()) {
@@ -119,6 +148,7 @@ public class GlobalApplication extends Application {
     }
 
     public void setRegistrationId(String registrationId) {
+
         try {
             final SharedPreferences prefs = getGCMPreferences();
             int appVersion = getAppVersion();
@@ -144,7 +174,7 @@ public class GlobalApplication extends Application {
     }
 
     private SharedPreferences getGCMPreferences() {
-        return getSharedPreferences("linkit",
+        return getSharedPreferences(TAG,
                 Context.MODE_PRIVATE);
     }
 

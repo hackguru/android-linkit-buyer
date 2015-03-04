@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -37,12 +36,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ams.android.linkit.Activity.MainActivity;
 import ams.android.linkit.Adapter.AdapterListview;
 import ams.android.linkit.Adapter.AdapterListviewEmpty;
 import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
-import ams.android.linkit.Tools.myListView;
+import ams.android.linkit.Tools.customListView;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 
@@ -50,14 +50,14 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  * Created by Aidin on 2/1/2015.
  */
 public class FragmentLinks extends Fragment {
-
-    ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
+    private static String TAG = "linkitShopper";
+    static ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
     ArrayList<LinkitObject> itemsEmpty = new ArrayList<LinkitObject>();
     AdapterListview adapterListview;
     AdapterListviewEmpty adapterListviewEmpty;
     SwipeRefreshLayout swipeLayout;
     RelativeLayout layWaiting;
-    myListView listView;
+    customListView listView;
     TextView txtEmptyInfo;
     LinkitObject currentItem;
     Boolean callState = false;
@@ -65,27 +65,26 @@ public class FragmentLinks extends Fragment {
     String globalEndDate = null;
     String globalStartDate = null;
 
-    public static final FragmentLinks newInstance(LinkitObject item) {
-        FragmentLinks f = new FragmentLinks();
-        f.currentItem = item;
-        return f;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
+//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        }
+        ((MainActivity) getActivity()).currentFragmentName = "Link";
+        try {
+            currentItem = getArguments().getParcelable("item");
+        } catch (Exception ex) {
         }
         View rootView = inflater.inflate(R.layout.fragment_links, container, false);
         userID = ((GlobalApplication) getActivity().getApplication()).getUserId();
         regID = ((GlobalApplication) getActivity().getApplication()).getRegistrationId();
-        listView = (myListView) rootView.findViewById(R.id.listView);
+        listView = (customListView) rootView.findViewById(R.id.listView);
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         ImageButton btnLogout = (ImageButton) rootView.findViewById(R.id.btn_logout);
         ImageButton btnInsta = (ImageButton) rootView.findViewById(R.id.btn_instagram);
-
         layWaiting = (RelativeLayout) rootView.findViewById(R.id.lay_waiting);
         txtEmptyInfo = (TextView) rootView.findViewById(R.id.txtEmptyInfo);
+
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +111,6 @@ public class FragmentLinks extends Fragment {
         btnInsta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 try {
                     Intent insta_intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.instagram.android");
                     startActivity(insta_intent);
@@ -125,7 +123,6 @@ public class FragmentLinks extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //addDataToStart();
                 refreshData();
             }
         });
@@ -133,9 +130,11 @@ public class FragmentLinks extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
         adapterListview = new AdapterListview(getActivity(), getFragmentManager(), items);
+        listView.setAdapter(adapterListview);
         listView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
-        listView.setOnDetectScrollListener(new myListView.OnDetectScrollListener() {
+        listView.setOnDetectScrollListener(new customListView.OnDetectScrollListener() {
             @Override
             public void onUpScrolling() {
 
@@ -145,7 +144,7 @@ public class FragmentLinks extends Fragment {
             public void onDownScrolling() {
                 if (listView.getLastVisiblePosition() == items.size() - 1) {
                     if (!callState) {
-                        Log.i("linkit", "end list");
+                        //Log.i("linkit", "end list");
                         layWaiting.setVisibility(View.VISIBLE);
                         callState = true;
                         addDataToEnd();
@@ -160,6 +159,7 @@ public class FragmentLinks extends Fragment {
         Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
         t.setScreenName("LinkitShopper - List");
         t.send(new HitBuilders.AppViewBuilder().build());
+
         return rootView;
     }
 
@@ -178,11 +178,6 @@ public class FragmentLinks extends Fragment {
         String URL = getResources().getString(R.string.BASE_URL) + "users/updateregid";
         client.post(URL, new AsyncHttpResponseHandler() {
             @Override
-            public void onStart() {
-
-            }
-
-            @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 ((GlobalApplication) getActivity().getApplication()).clearAllSettings();
                 try {
@@ -195,9 +190,8 @@ public class FragmentLinks extends Fragment {
                 itemsEmpty.clear();
                 FragmentLogin f1 = new FragmentLogin();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
+                ft.replace(R.id.container, f1);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                //ft.addToBackStack("Login");
                 ft.commit();
             }
 
@@ -236,10 +230,6 @@ public class FragmentLinks extends Fragment {
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
-            public void onStart() {
-            }
-
-            @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 try {
                     parseJSON(new String(response, "UTF-8"));
@@ -256,10 +246,6 @@ public class FragmentLinks extends Fragment {
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 callState = false;
                 swipeLayout.setRefreshing(false);
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
             }
         });
     }
@@ -296,10 +282,12 @@ public class FragmentLinks extends Fragment {
                     adapterListview.notifyDataSetChanged();
                     swipeLayout.setRefreshing(false);
                     if (currentItem != null) {
-                        FragmentWebView f1 = FragmentWebView.newInstance(items.get(0));
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                        ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
+                        FragmentWebView f1 = new FragmentWebView();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("item", items.get(0));
+                        f1.setArguments(bundle);
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                         ft.add(R.id.container, f1, "WebView");
                         ft.addToBackStack("WebView");
                         ft.commit();
@@ -492,17 +480,4 @@ public class FragmentLinks extends Fragment {
         List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
     }
-
-//    private void showToast(String text) {
-//        View layout = ginflater.inflate(R.layout.toast, (ViewGroup) grootView.findViewById(R.id.toast_layout_root));
-//        final CardView card = (CardView) layout.findViewById(R.id.card_view_toast);
-//        card.setCardBackgroundColor(Color.parseColor("#2191c1"));
-//        TextView textView = (TextView) layout.findViewById(R.id.text);
-//        textView.setText(text);
-//        Toast toast = new Toast(getActivity().getApplicationContext());
-//        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.BOTTOM, 0, 0);
-//        toast.setDuration(Toast.LENGTH_SHORT);
-//        toast.setView(layout);
-//        toast.show();
-//    }
 }

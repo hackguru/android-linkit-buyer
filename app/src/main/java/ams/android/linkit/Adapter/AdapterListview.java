@@ -1,11 +1,11 @@
 package ams.android.linkit.Adapter;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,18 +45,17 @@ import ams.android.linkit.Tools.GlobalApplication;
  * Created by Aidin on 2/3/2015.
  */
 public class AdapterListview extends BaseAdapter {
+    private static String TAG = "linkitShopper";
+    private Context context;
+    private final FragmentManager fragmentManager;
+    private ArrayList<LinkitObject> items = new ArrayList<>();
+    private ImageLoader imageLoader = ImageLoader.getInstance();
+    private final DisplayImageOptions options;
+    private final ImageLoadingListener imageListener;
 
-    static Activity activity;
-    static Context context;
-    static FragmentManager fragmentManager;
-    static ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
-    static ImageLoader imageLoader = ImageLoader.getInstance();
-    static DisplayImageOptions options;
-    static ImageLoadingListener imageListener;
 
-    public AdapterListview(Activity activity, FragmentManager fragmentManager, ArrayList<LinkitObject> items) {
-        this.activity = activity;
-        this.context = activity.getApplicationContext();
+    public AdapterListview(Context context, FragmentManager fragmentManager, ArrayList<LinkitObject> items) {
+        this.context = context;
         this.fragmentManager = fragmentManager;
         this.items = items;
         options = new DisplayImageOptions.Builder()
@@ -66,12 +65,6 @@ public class AdapterListview extends BaseAdapter {
                 .showImageForEmptyUri(R.drawable.unlink)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
-//                .preProcessor(new BitmapProcessor() {
-//                    @Override
-//                    public Bitmap process(Bitmap bitmap) {
-//                        return Bitmap.createScaledBitmap(bitmap, 400, 400, true);
-//                    }
-//                })
                 .build();
 
         imageListener = new ImageDisplayListener();
@@ -81,46 +74,57 @@ public class AdapterListview extends BaseAdapter {
         imageLoader = ImageLoader.getInstance();
     }
 
+    private static class ViewHolder {
+        public ImageView imgLink;
+        public ImageView imgInsta;
+        public ImageView imgProfile;
+        public TextView txtDesc;
+        public TextView txtOwner;
+    }
+
     @Override
     public View getView(final int position, View rootView, ViewGroup parent) {
-        LayoutInflater inflater = null;
-        if (inflater == null)
-            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (rootView == null) rootView = inflater.inflate(R.layout.item_list, null);
-
-        ImageView imgLink = (ImageView) rootView.findViewById(R.id.img_link);
-        ImageView imgInsta = (ImageView) rootView.findViewById(R.id.img_insta);
-        ImageView imgProfile = (ImageView) rootView.findViewById(R.id.imgProfile);
-        TextView txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
-        TextView txtOwner = (TextView) rootView.findViewById(R.id.txtOwner);
+        final ViewHolder holder;
+        if (rootView == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            rootView = inflater.inflate(R.layout.item_list, null);
+            holder = new ViewHolder();
+            holder.imgLink = (ImageView) rootView.findViewById(R.id.img_link);
+            holder.imgInsta = (ImageView) rootView.findViewById(R.id.img_insta);
+            holder.imgProfile = (ImageView) rootView.findViewById(R.id.imgProfile);
+            holder.txtDesc = (TextView) rootView.findViewById(R.id.txtDesc);
+            holder.txtOwner = (TextView) rootView.findViewById(R.id.txtOwner);
+            rootView.setTag(holder);
+        } else {
+            holder = (ViewHolder) rootView.getTag();
+        }
+        imageLoader.displayImage(items.get(position).linkSrceenShot, holder.imgLink, options, imageListener);
+        imageLoader.displayImage(items.get(position).imageUrl, holder.imgInsta, options, imageListener);
+        imageLoader.displayImage(items.get(position).ownerProfilePic, holder.imgProfile, options, imageListener);
 
         if (!items.get(position).caption.equals("null")) {
-            txtDesc.setText(items.get(position).caption);
+            holder.txtDesc.setText(items.get(position).caption);
         } else {
-            txtDesc.setText("");
+            holder.txtDesc.setText("");
         }
-
         if (!items.get(position).owner.equals("null")) {
-            txtOwner.setText(items.get(position).owner);
+            holder.txtOwner.setText(items.get(position).owner);
         } else {
-            txtOwner.setText("");
+            holder.txtOwner.setText("");
         }
-
-        imageLoader.displayImage(items.get(position).linkSrceenShot, imgLink, options, imageListener);
-        imageLoader.displayImage(items.get(position).imageUrl, imgInsta, options, imageListener);
-        imageLoader.displayImage(items.get(position).ownerProfilePic, imgProfile, options, imageListener);
-
-        //if (!items.get(position).linkToProduct.equals("")) {
-        imgLink.setOnClickListener(new View.OnClickListener() {
+        holder.imgLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new postOpenedAsync().execute(items.get(position).mediaID);
-                FragmentWebView f1 = FragmentWebView.newInstance(items.get(position));
+                FragmentWebView f1 = new FragmentWebView();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("item", items.get(position));
+                f1.setArguments(bundle);
                 FragmentTransaction ft = fragmentManager.beginTransaction();
-                ft.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.add(R.id.container, f1, "WebView");
                 ft.addToBackStack("WebView");
                 ft.commit();
+                new postOpenedAsync().execute(items.get(position).mediaID);
             }
         });
         return rootView;
@@ -142,8 +146,7 @@ public class AdapterListview extends BaseAdapter {
     }
 
     private class ImageDisplayListener extends SimpleImageLoadingListener {
-        final List<String> displayedImages = Collections
-                .synchronizedList(new LinkedList<String>());
+        final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
 
         @Override
         public void onLoadingStarted(String imageUri, View view) {
@@ -177,27 +180,19 @@ public class AdapterListview extends BaseAdapter {
         @Override
         protected String doInBackground(String... data) {
             HttpClient client = new DefaultHttpClient();
-            HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000); //Timeout Limit
-            //HttpResponse response;
+            HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000);
             JSONObject json = new JSONObject();
-
             try {
-                String urlJSON = activity.getResources().getString(R.string.BASE_URL).toString() + "users/" + ((GlobalApplication) activity.getApplication()).getUserId() + "/opened/" + data[0];
+                String urlJSON = context.getResources().getString(R.string.BASE_URL).toString() + "users/" + ((GlobalApplication) context.getApplicationContext()).getUserId() + "/opened/" + data[0];
                 HttpPost post = new HttpPost(urlJSON);
-                post.addHeader("token", ((GlobalApplication) activity.getApplication()).getRegistrationId());
+                post.addHeader("token", ((GlobalApplication) context.getApplicationContext()).getRegistrationId());
                 post.addHeader("device", "android");
                 post.addHeader("userType", "buyer");
                 StringEntity se = new StringEntity(json.toString());
                 se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
                 post.setEntity(se);
                 client.execute(post);
-//                    /*Checking response */
-//                InputStream in = null;
-//                if (response != null) {
-//                    in = response.getEntity().getContent(); //Get the data in the entity
-//                }
                 return "OK";
-
             } catch (Exception e) {
                 Log.i("linkit Response: ", "error" + e.getMessage());
                 e.printStackTrace();
