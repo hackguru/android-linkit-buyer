@@ -62,7 +62,6 @@ public class GlobalApplication extends Application {
         return context;
     }
 
-
     public void handleUncaughtException (Thread thread, Throwable e)
     {
         e.printStackTrace(); // not all Android versions will print the stack trace automatically
@@ -99,7 +98,6 @@ public class GlobalApplication extends Application {
     }
 
     public String getUserId() {
-
         final SharedPreferences prefs = getGCMPreferences();
         String userIdSaved = prefs.getString(PROPERTY_USER_ID, "");
         if (userIdSaved.isEmpty()) {

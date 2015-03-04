@@ -195,6 +195,9 @@ public class FragmentWebView extends Fragment {
                     case MotionEvent.ACTION_POINTER_UP:
                         imgInstaFull.setVisibility(View.INVISIBLE);
                         return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        imgInstaFull.setVisibility(View.INVISIBLE);
+                        return true;
                 }
                 return false;
             }

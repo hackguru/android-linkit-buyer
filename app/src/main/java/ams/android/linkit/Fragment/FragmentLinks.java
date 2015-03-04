@@ -415,9 +415,6 @@ public class FragmentLinks extends Fragment {
                     }
 
                     items.add(myobject);
-//                    if (!myobject.imageUrl.isEmpty()) {
-//                        items.add(myobject);
-//                    }
                 }
 
             } catch (JSONException e) {
