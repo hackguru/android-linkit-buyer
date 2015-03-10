@@ -1,14 +1,31 @@
 package ams.android.linkit.Activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
+import java.util.ArrayList;
+
+import ams.android.linkit.Adapter.AdapterDrawer;
 import ams.android.linkit.Fragment.FragmentLinks;
 import ams.android.linkit.Fragment.FragmentLogin;
 import ams.android.linkit.Fragment.FragmentWebView;
+import ams.android.linkit.Model.DrawerMenuItem;
 import ams.android.linkit.Model.LinkitObject;
 import ams.android.linkit.R;
 import ams.android.linkit.Tools.GlobalApplication;
@@ -17,15 +34,22 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 public class MainActivity extends Activity {
 
     private static String TAG = "linkit";
-
+    private static DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
     public static String currentFragmentName = "";
+    private ArrayList<DrawerMenuItem> menus = new ArrayList<>();
+    private Context mContext;
+    public static void openDrawerMenu() {
+        mDrawerLayout.openDrawer(Gravity.LEFT);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-
+        mContext = this;
         // clear Badget Counter
         try {
             ((GlobalApplication) getApplication()).setBadgetCount(0);
@@ -35,7 +59,7 @@ public class MainActivity extends Activity {
 
         // check if Notification Received
         if (!getIntent().hasExtra("RunByNoti")) {
-           if (savedInstanceState == null) {
+            if (savedInstanceState == null) {
                 checkLogin();
             }
         } else {
@@ -55,6 +79,82 @@ public class MainActivity extends Activity {
             ft.addToBackStack("Links");
             ft.commit();
         }
+        fillMenu();
+        _initMenu();
+    }
+
+    private void _initMenu() {
+        AdapterDrawer mAdapter = new AdapterDrawer(this);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_launcher, R.string.accept, R.string.decline) {
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        for (DrawerMenuItem myMenuItem : menus) mAdapter.addItem(myMenuItem);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        if (mDrawerList != null) mDrawerList.setAdapter(mAdapter);
+        mDrawerLayout.setScrimColor(Color.parseColor("#aaffffff"));
+        LayoutInflater inflater = getLayoutInflater();
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.drawer_header, mDrawerList, false);
+        mDrawerList.addHeaderView(header, null, false);
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                               @Override
+                                               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                                   mDrawerList.setItemChecked(position - 1, true);
+                                                   FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
+                                                   mDrawerLayout.closeDrawer(mDrawerList);
+                                                   if (position == 1) {
+                                                       ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshLikesData();
+                                                   } else if (position == 2) {
+                                                       ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshFeaturedData();
+                                                   } else if (position == 3) {
+                                                       AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                                       builder
+                                                               .setTitle("Logout")
+                                                               .setMessage("Do you want to logout?")
+                                                               .setIcon(R.drawable.ic_launcher)
+                                                               .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                                   public void onClick(DialogInterface dialog, int which) {
+                                                                       ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).serverLogout();
+                                                                   }
+                                                               });
+                                                       builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                           public void onClick(DialogInterface dialog, int which) {
+                                                               dialog.dismiss();
+                                                           }
+                                                       });
+                                                       AlertDialog alert = builder.create();
+                                                       alert.show();
+                                                   }
+                                               }
+                                           }
+
+        );
+    }
+
+    private void fillMenu() {
+        DrawerMenuItem myMenu = new DrawerMenuItem("1", "My Likes", "1", R.drawable.likes);
+        menus.add(myMenu);
+        myMenu = new DrawerMenuItem("2", "Featured Merchants ", "2", R.drawable.featured);
+        menus.add(myMenu);
+        myMenu = new DrawerMenuItem("3", "Sign Out ", "3", R.drawable.logout);
+        menus.add(myMenu);
     }
 
     @Override
@@ -65,7 +165,7 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         int count = getFragmentManager().getBackStackEntryCount();
-         Log.i(TAG, "popbackstack count: " + count);
+        Log.i(TAG, "popbackstack count: " + count);
 
         if (currentFragmentName.equals("WebView")) {
             FragmentWebView webFragment = (FragmentWebView) getFragmentManager().findFragmentByTag("WebView");
@@ -80,13 +180,13 @@ public class MainActivity extends Activity {
         } else if (currentFragmentName.equals("Intro")) {
             currentFragmentName = "Login";
             getFragmentManager().popBackStack();
-        }
-        else if (currentFragmentName.equals("Login")) {
+        } else if (currentFragmentName.equals("Login")) {
             finish();
         } else if (currentFragmentName.equals("Link")) {
             finish();
         }
     }
+
 
     private void checkLogin() {
         if (((GlobalApplication) getApplication()).getUserId().isEmpty()) {

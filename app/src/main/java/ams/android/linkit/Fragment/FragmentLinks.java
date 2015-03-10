@@ -1,10 +1,8 @@
 package ams.android.linkit.Fragment;
 
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -51,8 +49,9 @@ import me.leolin.shortcutbadger.ShortcutBadger;
  */
 public class FragmentLinks extends Fragment {
     private static String TAG = "linkitShopper";
-    static ArrayList<LinkitObject> items = new ArrayList<LinkitObject>();
-    ArrayList<LinkitObject> itemsEmpty = new ArrayList<LinkitObject>();
+    public static TextView txtMainTitle;
+    ArrayList<LinkitObject> itemsLikes = new ArrayList<>();
+    ArrayList<LinkitObject> itemsFeatured = new ArrayList<>();
     AdapterListview adapterListview;
     AdapterListviewEmpty adapterListviewEmpty;
     SwipeRefreshLayout swipeLayout;
@@ -61,15 +60,12 @@ public class FragmentLinks extends Fragment {
     TextView txtEmptyInfo;
     LinkitObject currentItem;
     Boolean callState = false;
-    String userID, regID;
     String globalEndDate = null;
     String globalStartDate = null;
+    String userID, regID;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
-//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//        }
         ((MainActivity) getActivity()).currentFragmentName = "Link";
         try {
             currentItem = getArguments().getParcelable("item");
@@ -80,31 +76,16 @@ public class FragmentLinks extends Fragment {
         regID = ((GlobalApplication) getActivity().getApplication()).getRegistrationId();
         listView = (customListView) rootView.findViewById(R.id.listView);
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        ImageButton btnLogout = (ImageButton) rootView.findViewById(R.id.btn_logout);
+        txtMainTitle = (TextView) rootView.findViewById(R.id.txtMainTitle);
+        ImageButton btnMenuDrawer = (ImageButton) rootView.findViewById(R.id.btnMenuDrawer);
         ImageButton btnInsta = (ImageButton) rootView.findViewById(R.id.btn_instagram);
         layWaiting = (RelativeLayout) rootView.findViewById(R.id.lay_waiting);
         txtEmptyInfo = (TextView) rootView.findViewById(R.id.txtEmptyInfo);
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+        btnMenuDrawer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder
-                        .setTitle("Logout")
-                        .setMessage("Do you want to logout?")
-                        .setIcon(R.drawable.ic_launcher)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                serverLogout();
-                            }
-                        });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
+                MainActivity.openDrawerMenu();
             }
         });
 
@@ -123,7 +104,7 @@ public class FragmentLinks extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshData();
+                refreshLikesData();
             }
         });
         swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
@@ -131,7 +112,7 @@ public class FragmentLinks extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        adapterListview = new AdapterListview(getActivity(), getFragmentManager(), items);
+        adapterListview = new AdapterListview(getActivity(), getFragmentManager(), itemsLikes);
         listView.setAdapter(adapterListview);
         listView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
         listView.setOnDetectScrollListener(new customListView.OnDetectScrollListener() {
@@ -142,7 +123,7 @@ public class FragmentLinks extends Fragment {
 
             @Override
             public void onDownScrolling() {
-                if (listView.getLastVisiblePosition() == items.size() - 1) {
+                if (listView.getLastVisiblePosition() == itemsLikes.size() - 1) {
                     if (!callState) {
                         //Log.i("linkit", "end list");
                         layWaiting.setVisibility(View.VISIBLE);
@@ -153,7 +134,7 @@ public class FragmentLinks extends Fragment {
             }
         });
         swipeLayout.setRefreshing(true);
-        refreshData();
+        refreshLikesData();
 
         // Get tracker.
         Tracker t = ((GlobalApplication) getActivity().getApplication()).getTracker(GlobalApplication.TrackerName.APP_TRACKER);
@@ -172,7 +153,7 @@ public class FragmentLinks extends Fragment {
 
     public void serverLogout() {
         AsyncHttpClient client = new AsyncHttpClient();
-        client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
+        client.addHeader("token", regID);
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
         String URL = getResources().getString(R.string.BASE_URL) + "users/updateregid";
@@ -186,8 +167,8 @@ public class FragmentLinks extends Fragment {
                 } catch (Exception e) {
                 }
                 //showToast("Logout");
-                items.clear();
-                itemsEmpty.clear();
+                itemsLikes.clear();
+                itemsFeatured.clear();
                 FragmentLogin f1 = new FragmentLogin();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, f1);
@@ -221,7 +202,7 @@ public class FragmentLinks extends Fragment {
     public void addDataToEnd() {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
-        client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
+        client.addHeader("token", regID);
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
         if (globalStartDate != null) {
@@ -232,11 +213,11 @@ public class FragmentLinks extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 try {
-                    parseJSON(new String(response, "UTF-8"));
+                    parseJsonLikes(new String(response, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                globalStartDate = items.get(items.size() - 1).createdDate;
+                globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
                 adapterListview.notifyDataSetChanged();
                 layWaiting.setVisibility(View.INVISIBLE);
                 callState = false;
@@ -250,10 +231,13 @@ public class FragmentLinks extends Fragment {
         });
     }
 
-    public void refreshData() {
+    public void refreshLikesData() {
+        itemsLikes.clear();
+        adapterListview.notifyDataSetChanged();
+        listView.setVisibility(View.GONE);
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
-        client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
+        client.addHeader("token", regID);
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
         if (globalStartDate != null) {
@@ -264,20 +248,19 @@ public class FragmentLinks extends Fragment {
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                items.clear();
+                itemsLikes.clear();
                 try {
-                    parseJSON(new String(response, "UTF-8"));
+                    parseJsonLikes(new String(response, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                if (items.isEmpty()) {
+                if (itemsLikes.isEmpty()) {
                     txtEmptyInfo.setVisibility(View.VISIBLE);
-                    refreshDataEmpty();
-
+                    listView.setVisibility(View.GONE);
                 } else {
                     txtEmptyInfo.setVisibility(View.GONE);
-                    //globalEndDate = items.get(0).createdDate;
-                    globalStartDate = items.get(items.size() - 1).createdDate;
+                    listView.setVisibility(View.VISIBLE);
+                    globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
                     listView.setAdapter(adapterListview);
                     adapterListview.notifyDataSetChanged();
                     swipeLayout.setRefreshing(false);
@@ -285,7 +268,7 @@ public class FragmentLinks extends Fragment {
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
                         FragmentWebView f1 = new FragmentWebView();
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("item", items.get(0));
+                        bundle.putParcelable("item", itemsLikes.get(0));
                         f1.setArguments(bundle);
                         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                         ft.add(R.id.container, f1, "WebView");
@@ -294,7 +277,6 @@ public class FragmentLinks extends Fragment {
                         currentItem = null;
                     }
                 }
-                //showToast("Data Updated");
             }
 
             @Override
@@ -304,39 +286,40 @@ public class FragmentLinks extends Fragment {
         });
     }
 
-    public void refreshDataEmpty() {
+    public void refreshFeaturedData() {
+        txtEmptyInfo.setVisibility(View.GONE);
+        listView.setVisibility(View.GONE);
+        itemsFeatured.clear();
+        adapterListview.notifyDataSetChanged();
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
-        client.addHeader("token", ((GlobalApplication) getActivity().getApplication()).getRegistrationId());
+        client.addHeader("token", regID);
         client.addHeader("device", "android");
         client.addHeader("userType", "buyer");
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/recommendedMerchants";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
-            public void onStart() {
-            }
-
-            @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                itemsEmpty.clear();
+                itemsFeatured.clear();
                 try {
-                    parseJSONEmpty(new String(response, "UTF-8"));
+                    parseJsonFeatured(new String(response, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
                 swipeLayout.setRefreshing(false);
-                adapterListviewEmpty = new AdapterListviewEmpty(getActivity(), getFragmentManager(), itemsEmpty);
+                adapterListviewEmpty = new AdapterListviewEmpty(getActivity(), getFragmentManager(), itemsFeatured);
                 listView.setAdapter(adapterListviewEmpty);
+                listView.setVisibility(View.VISIBLE);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Uri uri = Uri.parse("http://instagram.com/_u/" + itemsEmpty.get(position).owner);
+                        Uri uri = Uri.parse("http://instagram.com/_u/" + itemsFeatured.get(position).owner);
                         Intent insta = new Intent(Intent.ACTION_VIEW, uri);
                         insta.setPackage("com.instagram.android");
                         if (isIntentAvailable(getActivity().getApplicationContext(), insta)) {
                             startActivity(insta);
                         } else {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsEmpty.get(position).owner)));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsFeatured.get(position).owner)));
                         }
                     }
                 });
@@ -345,17 +328,12 @@ public class FragmentLinks extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                //Log.e("linkit", "ERR : " + errorResponse.toString());
                 swipeLayout.setRefreshing(false);
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
             }
         });
     }
 
-    private void parseJSON(String jsonStr) {
+    private void parseJsonLikes(String jsonStr) {
         if (jsonStr != null) {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
@@ -414,7 +392,7 @@ public class FragmentLinks extends Fragment {
                         myobject.imageUrl = "";
                     }
 
-                    items.add(myobject);
+                    itemsLikes.add(myobject);
                 }
 
             } catch (JSONException e) {
@@ -425,7 +403,7 @@ public class FragmentLinks extends Fragment {
         }
     }
 
-    private void parseJSONEmpty(String jsonStr) {
+    private void parseJsonFeatured(String jsonStr) {
         if (jsonStr != null) {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
@@ -461,7 +439,7 @@ public class FragmentLinks extends Fragment {
                     }
                     //
 
-                    itemsEmpty.add(myobject);
+                    itemsFeatured.add(myobject);
                 }
 
             } catch (JSONException e) {

@@ -5,6 +5,21 @@
     android:background="#0000"
     tools:context=".MainActivity$PlaceholderFragment">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtEmptyInfo"
+        android:layout_below="@+id/layout_main_bar"
+        android:layout_centerHorizontal="true"
+        android:text="As soon as you like one of our merchants&apos; instagrams, we will show linked products here!"
+        android:textColor="#535353"
+        android:visibility="invisible"
+        android:textSize="18dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingRight="10dp" />
+
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swipe_container"
         android:layout_width="fill_parent"
@@ -46,36 +61,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="false"
-            android:layout_alignParentRight="false"
-            android:layout_centerVertical="true"
-            android:adjustViewBounds="true"
-            android:background="#0000"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/instagram"
-            android:layout_alignParentLeft="true" />
-
-        <ImageView
-            android:id="@+id/img_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:adjustViewBounds="true"
-            android:padding="5dp"
-            android:src="@drawable/linkit" />
-
-        <ImageButton
-            android:id="@+id/btn_logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="false"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
             android:background="#0000"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/logout" />
+            android:src="@drawable/instagram"
+            android:layout_alignParentLeft="false" />
+
+        <ImageButton
+            android:id="@+id/btnMenuDrawer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:background="#0000"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/menu"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -83,6 +89,15 @@
             android:layout_alignParentBottom="true"
             android:background="#cccccc"
             android:orientation="horizontal"></LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/txtMainTitle"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="true"
+            android:textColor="#535353" />
 
     </RelativeLayout>
 
@@ -106,21 +121,6 @@
             android:indeterminate="true" />
 
     </RelativeLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtEmptyInfo"
-        android:layout_below="@+id/layout_main_bar"
-        android:layout_centerHorizontal="true"
-        android:text="As soon as you like one of our merchants&apos; instagrams, we will show linked products here! Find some of our featured merchants below:"
-        android:textColor="#2191c1"
-        android:visibility="invisible"
-        android:textSize="18dp"
-        android:paddingLeft="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:paddingRight="10dp" />
 
 
 </RelativeLayout>

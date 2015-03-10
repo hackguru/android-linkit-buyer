@@ -211,8 +211,7 @@ public class FragmentLogin extends Fragment {
                 ((GlobalApplication) getActivity().getApplication()).setUserId(jsonObj.getString("userId"));
                 FragmentLinks f1 = new FragmentLinks();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, f1); // f1_container is your FrameLayout container
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.replace(R.id.container, f1, "Links");
                 ft.commit();
             } catch (JSONException e) {
                 e.printStackTrace();
