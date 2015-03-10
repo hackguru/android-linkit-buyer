@@ -62,6 +62,7 @@ public class FragmentLinks extends Fragment {
     Boolean callState = false;
     String globalEndDate = null;
     String globalStartDate = null;
+    String listViewType;
     String userID, regID;
 
     @Override
@@ -104,7 +105,11 @@ public class FragmentLinks extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLikesData();
+                if (listViewType == "L") {
+                    refreshLikesData();
+                } else if (listViewType == "F") {
+                    refreshFeaturedData();
+                }
             }
         });
         swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
@@ -232,6 +237,7 @@ public class FragmentLinks extends Fragment {
     }
 
     public void refreshLikesData() {
+        listViewType = "L";
         itemsLikes.clear();
         adapterListview.notifyDataSetChanged();
         listView.setVisibility(View.GONE);
@@ -287,6 +293,7 @@ public class FragmentLinks extends Fragment {
     }
 
     public void refreshFeaturedData() {
+        listViewType = "F";
         txtEmptyInfo.setVisibility(View.GONE);
         listView.setVisibility(View.GONE);
         itemsFeatured.clear();
