@@ -117,11 +117,12 @@ public class MainActivity extends Activity {
                                                @Override
                                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                                    mDrawerList.setItemChecked(position - 1, true);
-                                                   FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
                                                    mDrawerLayout.closeDrawer(mDrawerList);
                                                    if (position == 1) {
+                                                       FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
                                                        ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshLikesData();
                                                    } else if (position == 2) {
+                                                       FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
                                                        ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshFeaturedData();
                                                    } else if (position == 3) {
                                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
