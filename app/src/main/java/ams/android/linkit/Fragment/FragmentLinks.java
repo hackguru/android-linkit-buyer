@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -63,7 +62,7 @@ public class FragmentLinks extends Fragment {
     String globalEndDate = null;
     String globalStartDate = null;
     String listViewType;
-    String userID, regID;
+    String userID, regID, merchantID;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -109,6 +108,8 @@ public class FragmentLinks extends Fragment {
                     refreshLikesData();
                 } else if (listViewType == "F") {
                     refreshFeaturedData();
+                } else if (listViewType == "P") {
+                    refreshMerchantPostedData();
                 }
             }
         });
@@ -133,7 +134,14 @@ public class FragmentLinks extends Fragment {
                         //Log.i("linkit", "end list");
                         layWaiting.setVisibility(View.VISIBLE);
                         callState = true;
-                        addDataToEnd();
+                        if (listViewType == "L") {
+                            addDataToEndLikes();
+                        } else if (listViewType == "F") {
+                            //refreshFeaturedData();
+                        } else if (listViewType == "P") {
+                            addDataToEndMerchantPosted();
+                        }
+
                     }
                 }
             }
@@ -147,13 +155,6 @@ public class FragmentLinks extends Fragment {
         t.send(new HitBuilders.AppViewBuilder().build());
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-//        swipeLayout.setRefreshing(true);
-//        refreshData();
     }
 
     public void serverLogout() {
@@ -176,7 +177,7 @@ public class FragmentLinks extends Fragment {
                 itemsFeatured.clear();
                 FragmentLogin f1 = new FragmentLogin();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, f1);
+                ft.replace(R.id.container, f1,"Login");
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.commit();
             }
@@ -204,7 +205,7 @@ public class FragmentLinks extends Fragment {
         });
     }
 
-    public void addDataToEnd() {
+    public void addDataToEndLikes() {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
         client.addHeader("token", regID);
@@ -232,6 +233,40 @@ public class FragmentLinks extends Fragment {
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 callState = false;
                 swipeLayout.setRefreshing(false);
+                layWaiting.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    public void addDataToEndMerchantPosted() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams requestParams = new RequestParams();
+        client.addHeader("token", regID);
+        client.addHeader("device", "android");
+        client.addHeader("userType", "buyer");
+        if (globalStartDate != null) {
+            requestParams.add("endDate", globalStartDate);
+        }
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + merchantID + "/matchedmedia";
+        client.get(URL, requestParams, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                try {
+                    parseJsonLikes(new String(response, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
+                adapterListview.notifyDataSetChanged();
+                layWaiting.setVisibility(View.INVISIBLE);
+                callState = false;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                callState = false;
+                swipeLayout.setRefreshing(false);
+                layWaiting.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -268,6 +303,64 @@ public class FragmentLinks extends Fragment {
                     listView.setVisibility(View.VISIBLE);
                     globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
                     listView.setAdapter(adapterListview);
+                    listView.setOnItemClickListener(null);
+                    adapterListview.notifyDataSetChanged();
+                    swipeLayout.setRefreshing(false);
+                    if (currentItem != null) {
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        FragmentWebView f1 = new FragmentWebView();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("item", itemsLikes.get(0));
+                        f1.setArguments(bundle);
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                        ft.add(R.id.container, f1, "WebView");
+                        ft.addToBackStack("WebView");
+                        ft.commit();
+                        currentItem = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                swipeLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    public void refreshMerchantPostedData() {
+        listViewType = "P";
+        itemsLikes.clear();
+        adapterListview.notifyDataSetChanged();
+        listView.setVisibility(View.GONE);
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams requestParams = new RequestParams();
+        client.addHeader("token", regID);
+        client.addHeader("device", "android");
+        client.addHeader("userType", "buyer");
+        if (globalStartDate != null) {
+            requestParams.add("startDate", globalStartDate);
+        }
+
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + merchantID + "/matchedmedia";
+        client.get(URL, requestParams, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                itemsLikes.clear();
+                try {
+                    parseJsonLikes(new String(response, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                if (itemsLikes.isEmpty()) {
+                    txtEmptyInfo.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
+                } else {
+                    txtEmptyInfo.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                    globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
+                    listView.setAdapter(adapterListview);
+                    listView.setOnItemClickListener(null);
                     adapterListview.notifyDataSetChanged();
                     swipeLayout.setRefreshing(false);
                     if (currentItem != null) {
@@ -320,14 +413,17 @@ public class FragmentLinks extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Uri uri = Uri.parse("http://instagram.com/_u/" + itemsFeatured.get(position).owner);
-                        Intent insta = new Intent(Intent.ACTION_VIEW, uri);
-                        insta.setPackage("com.instagram.android");
-                        if (isIntentAvailable(getActivity().getApplicationContext(), insta)) {
-                            startActivity(insta);
-                        } else {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsFeatured.get(position).owner)));
-                        }
+
+                        merchantID = itemsFeatured.get(position).mediaID;
+                        refreshMerchantPostedData();
+//                        Uri uri = Uri.parse("http://instagram.com/_u/" + itemsFeatured.get(position).owner);
+//                        Intent insta = new Intent(Intent.ACTION_VIEW, uri);
+//                        insta.setPackage("com.instagram.android");
+//                        if (isIntentAvailable(getActivity().getApplicationContext(), insta)) {
+//                            startActivity(insta);
+//                        } else {
+//                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + itemsFeatured.get(position).owner)));
+//                        }
                     }
                 });
                 adapterListviewEmpty.notifyDataSetChanged();
@@ -351,6 +447,7 @@ public class FragmentLinks extends Fragment {
                 counterSeed = 1;
                 for (int i = counterStart; i < counterEnd; i = i + counterSeed) {
                     JSONObject item = feeds.getJSONObject(i);
+                    JSONObject xitem;
                     LinkitObject myobject = new LinkitObject();
 
                     if (item.has("_id")) {
@@ -358,43 +455,49 @@ public class FragmentLinks extends Fragment {
                     } else {
                         myobject.mediaID = "";
                     }
-                    if (item.getJSONObject("media").getJSONObject("owner").has("username")) {
-                        myobject.owner = item.getJSONObject("media").getJSONObject("owner").getString("username");
+
+                    if (item.has("media")) {
+                        xitem = item.getJSONObject("media");
+                    } else {
+                        xitem = item;
+                    }
+                    if (xitem.getJSONObject("owner").has("username")) {
+                        myobject.owner = xitem.getJSONObject("owner").getString("username");
                     } else {
                         myobject.owner = "";
                     }
-                    if (item.getJSONObject("media").getJSONObject("owner").has("profilePicture")) {
-                        myobject.ownerProfilePic = item.getJSONObject("media").getJSONObject("owner").getString("profilePicture");
+                    if (xitem.getJSONObject("owner").has("profilePicture")) {
+                        myobject.ownerProfilePic = xitem.getJSONObject("owner").getString("profilePicture");
                     } else {
                         myobject.ownerProfilePic = "";
                     }
-                    if (item.getJSONObject("media").has("created")) {
-                        myobject.createdDate = item.getJSONObject("media").getString("created");
+                    if (xitem.has("created")) {
+                        myobject.createdDate = xitem.getString("created");
                     } else {
                         myobject.createdDate = "";
                     }
-                    if (item.getJSONObject("media").has("caption")) {
-                        myobject.caption = item.getJSONObject("media").getString("caption");
+                    if (xitem.has("caption")) {
+                        myobject.caption = xitem.getString("caption");
                     } else {
                         myobject.caption = "";
                     }
-                    if (item.getJSONObject("media").has("productDescription")) {
-                        myobject.productDescription = item.getJSONObject("media").getString("productDescription");
+                    if (xitem.has("productDescription")) {
+                        myobject.productDescription = xitem.getString("productDescription");
                     } else {
                         myobject.productDescription = "";
                     }
-                    if (item.getJSONObject("media").has("linkToProduct")) {
-                        myobject.productLink = item.getJSONObject("media").getString("linkToProduct");
+                    if (xitem.has("linkToProduct")) {
+                        myobject.productLink = xitem.getString("linkToProduct");
                     } else {
                         myobject.productLink = "";
                     }
-                    if (item.getJSONObject("media").has("productLinkScreenshot")) {
-                        myobject.linkSrceenShot = item.getJSONObject("media").getString("productLinkScreenshot");
+                    if (xitem.has("productLinkScreenshot")) {
+                        myobject.linkSrceenShot = xitem.getString("productLinkScreenshot");
                     } else {
                         myobject.linkSrceenShot = "";
                     }
-                    if (item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").has("url")) {
-                        myobject.imageUrl = item.getJSONObject("media").getJSONObject("images").getJSONObject("standard_resolution").getString("url");
+                    if (xitem.getJSONObject("images").getJSONObject("standard_resolution").has("url")) {
+                        myobject.imageUrl = xitem.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
                     } else {
                         myobject.imageUrl = "";
                     }

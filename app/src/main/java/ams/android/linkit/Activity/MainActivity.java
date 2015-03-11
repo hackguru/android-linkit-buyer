@@ -121,10 +121,10 @@ public class MainActivity extends Activity {
                                                    if (position == 1) {
                                                        FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
                                                        ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshLikesData();
-                                                   } else if (position == 2) {
+                                                   } else if (position == 3) {
                                                        FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
                                                        ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshFeaturedData();
-                                                   } else if (position == 3) {
+                                                   } else if (position == 9) {
                                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                                                        builder
                                                                .setTitle("Logout")
@@ -152,9 +152,11 @@ public class MainActivity extends Activity {
     private void fillMenu() {
         DrawerMenuItem myMenu = new DrawerMenuItem("1", "My Likes", "1", R.drawable.likes);
         menus.add(myMenu);
-        myMenu = new DrawerMenuItem("2", "Featured Merchants ", "2", R.drawable.featured);
+        myMenu = new DrawerMenuItem("2", "My Merchants", "2", R.drawable.mymerchant);
         menus.add(myMenu);
-        myMenu = new DrawerMenuItem("3", "Sign Out ", "3", R.drawable.logout);
+        myMenu = new DrawerMenuItem("3", "Featured Merchants", "3", R.drawable.featured);
+        menus.add(myMenu);
+        myMenu = new DrawerMenuItem("9", "Sign Out ", "3", R.drawable.logout);
         menus.add(myMenu);
     }
 
