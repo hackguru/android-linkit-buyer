@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -61,9 +62,9 @@ public class FragmentWebView extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
-//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//        }
+
+        MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
         ((MainActivity) getActivity()).currentFragmentName = "WebView";
         try {
             currentItem = getArguments().getParcelable("item");
@@ -148,6 +149,7 @@ public class FragmentWebView extends Fragment {
             @Override
             public void onClick(View v) {
                 getFragmentManager().popBackStack();
+                MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             }
         });
 

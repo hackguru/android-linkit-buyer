@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -62,7 +63,7 @@ public class FragmentLinks extends Fragment {
     String globalEndDate = null;
     String globalStartDate = null;
     String listViewType;
-    String userID, regID, merchantID;
+    String userID, regID, merchantID, merchantUsername;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,8 +94,19 @@ public class FragmentLinks extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    Intent insta_intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.instagram.android");
-                    startActivity(insta_intent);
+                    if (merchantID != null) {
+                        Uri uri = Uri.parse("http://instagram.com/_u/" + merchantUsername);
+                        Intent insta = new Intent(Intent.ACTION_VIEW, uri);
+                        insta.setPackage("com.instagram.android");
+                        if (isIntentAvailable(getActivity().getApplicationContext(), insta)) {
+                            startActivity(insta);
+                        } else {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://instagram.com/" + merchantUsername)));
+                        }
+                    } else {
+                        Intent insta_intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.instagram.android");
+                        startActivity(insta_intent);
+                    }
                 } catch (Exception e) {
                     Log.e("linkitBuyer", "can't open Instagram");
                 }
@@ -104,12 +116,15 @@ public class FragmentLinks extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                globalStartDate=null;
                 if (listViewType == "L") {
                     refreshLikesData();
                 } else if (listViewType == "F") {
-                    refreshFeaturedData();
+                    refreshFeaturedMerchantData();
                 } else if (listViewType == "P") {
                     refreshMerchantPostedData();
+                } else if (listViewType == "M") {
+                    refreshMyMerchantPostedData();
                 }
             }
         });
@@ -140,6 +155,8 @@ public class FragmentLinks extends Fragment {
                             //refreshFeaturedData();
                         } else if (listViewType == "P") {
                             addDataToEndMerchantPosted();
+                        } else if (listViewType == "M") {
+                            addDataToEndMyMerchantPosted();
                         }
 
                     }
@@ -177,7 +194,7 @@ public class FragmentLinks extends Fragment {
                 itemsFeatured.clear();
                 FragmentLogin f1 = new FragmentLogin();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, f1,"Login");
+                ft.replace(R.id.container, f1, "Login");
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.commit();
             }
@@ -238,6 +255,39 @@ public class FragmentLinks extends Fragment {
         });
     }
 
+    public void addDataToEndMyMerchantPosted() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams requestParams = new RequestParams();
+        client.addHeader("token", regID);
+        client.addHeader("device", "android");
+        client.addHeader("userType", "buyer");
+        if (globalStartDate != null) {
+            requestParams.add("endDate", globalStartDate);
+        }
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/followsmedia";
+        client.get(URL, requestParams, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                try {
+                    parseJsonLikes(new String(response, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
+                adapterListview.notifyDataSetChanged();
+                layWaiting.setVisibility(View.INVISIBLE);
+                callState = false;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                callState = false;
+                swipeLayout.setRefreshing(false);
+                layWaiting.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
     public void addDataToEndMerchantPosted() {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams requestParams = new RequestParams();
@@ -272,6 +322,8 @@ public class FragmentLinks extends Fragment {
     }
 
     public void refreshLikesData() {
+        merchantID=null;
+        merchantUsername=null;
         listViewType = "L";
         itemsLikes.clear();
         adapterListview.notifyDataSetChanged();
@@ -286,6 +338,65 @@ public class FragmentLinks extends Fragment {
         }
 
         String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/likedmedias";
+        client.get(URL, requestParams, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                itemsLikes.clear();
+                try {
+                    parseJsonLikes(new String(response, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                if (itemsLikes.isEmpty()) {
+                    txtEmptyInfo.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
+                } else {
+                    txtEmptyInfo.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                    globalStartDate = itemsLikes.get(itemsLikes.size() - 1).createdDate;
+                    listView.setAdapter(adapterListview);
+                    listView.setOnItemClickListener(null);
+                    adapterListview.notifyDataSetChanged();
+                    swipeLayout.setRefreshing(false);
+                    if (currentItem != null) {
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        FragmentWebView f1 = new FragmentWebView();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("item", itemsLikes.get(0));
+                        f1.setArguments(bundle);
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                        ft.add(R.id.container, f1, "WebView");
+                        ft.addToBackStack("WebView");
+                        ft.commit();
+                        currentItem = null;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                swipeLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    public void refreshMyMerchantPostedData() {
+        merchantID=null;
+        merchantUsername=null;
+        listViewType = "M";
+        itemsLikes.clear();
+        adapterListview.notifyDataSetChanged();
+        listView.setVisibility(View.GONE);
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams requestParams = new RequestParams();
+        client.addHeader("token", regID);
+        client.addHeader("device", "android");
+        client.addHeader("userType", "buyer");
+        if (globalStartDate != null) {
+            requestParams.add("startDate", globalStartDate);
+        }
+
+        String URL = getResources().getString(R.string.BASE_URL) + "users/" + userID + "/followsmedia";
         client.get(URL, requestParams, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
@@ -385,7 +496,7 @@ public class FragmentLinks extends Fragment {
         });
     }
 
-    public void refreshFeaturedData() {
+    public void refreshFeaturedMerchantData() {
         listViewType = "F";
         txtEmptyInfo.setVisibility(View.GONE);
         listView.setVisibility(View.GONE);
@@ -413,8 +524,9 @@ public class FragmentLinks extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                        globalStartDate=null;
                         merchantID = itemsFeatured.get(position).mediaID;
+                        merchantUsername = itemsFeatured.get(position).owner;
                         refreshMerchantPostedData();
 //                        Uri uri = Uri.parse("http://instagram.com/_u/" + itemsFeatured.get(position).owner);
 //                        Intent insta = new Intent(Intent.ACTION_VIEW, uri);

@@ -34,12 +34,13 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 public class MainActivity extends Activity {
 
     private static String TAG = "linkit";
-    private static DrawerLayout mDrawerLayout;
+    public static DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     public static String currentFragmentName = "";
     private ArrayList<DrawerMenuItem> menus = new ArrayList<>();
     private Context mContext;
+
     public static void openDrawerMenu() {
         mDrawerLayout.openDrawer(Gravity.LEFT);
     }
@@ -121,10 +122,13 @@ public class MainActivity extends Activity {
                                                    if (position == 1) {
                                                        FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
                                                        ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshLikesData();
+                                                   } else if (position == 2) {
+                                                       FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
+                                                       ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshMyMerchantPostedData();
                                                    } else if (position == 3) {
                                                        FragmentLinks.txtMainTitle.setText(menus.get(position - 1).title);
-                                                       ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshFeaturedData();
-                                                   } else if (position == 9) {
+                                                       ((FragmentLinks) getFragmentManager().findFragmentByTag("Links")).refreshFeaturedMerchantData();
+                                                   } else if (position == 4) {
                                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                                                        builder
                                                                .setTitle("Logout")
@@ -156,7 +160,7 @@ public class MainActivity extends Activity {
         menus.add(myMenu);
         myMenu = new DrawerMenuItem("3", "Featured Merchants", "3", R.drawable.featured);
         menus.add(myMenu);
-        myMenu = new DrawerMenuItem("9", "Sign Out ", "3", R.drawable.logout);
+        myMenu = new DrawerMenuItem("9", "Sign Out ", "9", R.drawable.logout);
         menus.add(myMenu);
     }
 

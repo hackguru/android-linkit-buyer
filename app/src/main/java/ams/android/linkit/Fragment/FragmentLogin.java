@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +53,8 @@ public class FragmentLogin extends Fragment {
 //        if (!(getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)) {
 //            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //        }
+
+        MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         ((MainActivity) getActivity()).currentFragmentName = "Login";
 
@@ -207,6 +210,7 @@ public class FragmentLogin extends Fragment {
     private void parseJSON(String jsonStr) {
         if (jsonStr != null) {
             try {
+                MainActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 ((GlobalApplication) getActivity().getApplication()).setUserId(jsonObj.getString("userId"));
                 FragmentLinks f1 = new FragmentLinks();
